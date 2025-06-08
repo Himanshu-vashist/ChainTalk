@@ -32,10 +32,12 @@ const ModelScreen = () => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             quality: 0.7,
+            base64: false, // Explicitly disable base64
         });
 
-        if (!result.cancelled) {
+        if (!result.canceled) {
             setImage(result.assets[0]);
+            console.log("Selected image:", result.assets[0]); // Debug image object
         }
     };
 
@@ -43,53 +45,51 @@ const ModelScreen = () => {
         const url = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
         const formData = new FormData();
 
-        const uriParts = image.uri.split(".");
-        const fileType = uriParts[uriParts.length - 1];
+        // Handle base64 or file URI
+        let fileUri = image.uri;
+        let fileType = image.mimeType || "image/jpeg";
+        let fileName = image.fileName || `photo.jpg`;
 
-        formData.append("file", {
-            uri: image.uri,
-            name: `photo.${fileType}`,
-            type: `image/${fileType}`,
-        });
+        // If uri is a base64 data URL, convert to Blob
+        if (fileUri.startsWith("data:image")) {
+            const base64String = fileUri.split(",")[1];
+            const binaryString = atob(base64String);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            const blob = new Blob([bytes], { type: fileType });
+            formData.append("file", blob, fileName);
+        } else {
+            // Handle file URI
+            fileUri = Platform.OS === "ios" ? fileUri.replace("file://", "") : fileUri;
+            const fileExtension = fileUri.split(".").pop()?.toLowerCase() || "jpg";
+            fileType = fileExtension === "jpg" ? "image/jpeg" : `image/${fileExtension}`;
+            fileName = image.fileName || `photo.${fileExtension}`;
 
-        formData.append("pinataMetadata", JSON.stringify({ name: image.fileName || "avatar" }));
+            formData.append("file", {
+                uri: fileUri,
+                name: fileName,
+                type: fileType,
+            });
+        }
 
         try {
             const res = await fetch(url, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI2OWZjZjE4Yi04YzIxLTQxNTMtODQ3NS0xMTI2ODUxZjY4NjciLCJlbWFpbCI6InVqamF3YWxrdW1hcm11a2hlcmplZTMzNUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMzZiNmEwNTRlMGMyOTRiNjNkYzgiLCJzY29wZWRLZXlTZWNyZXQiOiJlMTdkOTU2N2JmYWU1MjRmN2Y3Y2MyYzRhOTk4N2ZhZWQ1NTZlYTY3NjY0NzFjNjI4ZGFmNzQzMmVhMjg3NmFlIiwiZXhwIjoxNzc3MTg3NjkyfQ.mCuTmFcV0b7zGWVX6h1gJSE3vFkd_prv-TwKrv_VrgQ`,
-                    "Content-Type": "multipart/form-data",
                 },
                 body: formData,
             });
 
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Upload to Pinata failed");
-            return `https://gateway.pinata.cloud/ipfs/${data.IpfsHash}`;
+            console.log("Pinata response:", JSON.stringify(data, null, 2)); // Debug response
+            if (!res.ok) throw new Error(data.error?.details || data.error || "Upload to Pinata failed");
+            return data.IpfsHash; // Return only the IPFS hash
         } catch (error) {
+            console.error("Pinata upload error:", error);
             throw new Error("Image upload failed: " + error.message);
-        }
-    };
-
-    const uploadMetadataToPinata = async (name, address, imageUrl) => {
-        const jsonData = { name, physicalAddress: address, image: imageUrl };
-
-        try {
-            const res = await fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer YOUR_PINATA_JWT_HERE`,
-                },
-                body: JSON.stringify(jsonData),
-            });
-
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Metadata upload failed");
-            return data.IpfsHash;
-        } catch (err) {
-            throw new Error("Metadata upload failed: " + err.message);
         }
     };
 
@@ -100,17 +100,12 @@ const ModelScreen = () => {
         }
 
         try {
-            const imageUrl = await uploadToPinata(image);
-            const metadataHash = await uploadMetadataToPinata(
-                form.name,
-                form.physicalAddress,
-                imageUrl
-            );
+            const imageHash = await uploadToPinata(image);
 
             await createAccount({
                 name: form.name,
                 physicalAddress: form.physicalAddress,
-                imageHash: metadataHash,
+                imageHash: imageHash, // Pass IPFS hash directly
             });
 
             setForm({ name: "", physicalAddress: "" });
@@ -118,7 +113,7 @@ const ModelScreen = () => {
             setError("");
             Alert.alert("Success", "Account created successfully!");
         } catch (err) {
-            console.error(err);
+            console.error("Submit error:", err);
             setError(err.message);
         }
     };
