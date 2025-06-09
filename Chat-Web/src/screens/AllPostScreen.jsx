@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useRef, useState } from 'react';
+import React, { useEffect, useContext, useRef, useState, Component } from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,45 @@ import {
   ActivityIndicator,
   Image,
   TouchableOpacity,
+  TextInput,
   Platform,
 } from 'react-native';
 import { chatAppContext } from '../Context/ChatAppContext';
 import { useTheme } from '../Context/ThemeContext';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+
+// Error Boundary Component
+class ErrorBoundary extends Component {
+  state = { hasError: false, error: null };
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Error caught by ErrorBoundary:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <View style={styles.errorContainer}>
+          <Text style={[styles.errorText, { color: '#d32f2f' }]}>
+            Error loading post: {this.state.error?.toString()}
+          </Text>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={() => this.setState({ hasError: false, error: null })}
+          >
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const PostCard = ({ post, index }) => {
   const { colors } = useTheme();
@@ -36,79 +69,112 @@ const PostCard = ({ post, index }) => {
         delay: index * 100,
       }),
     ]).start();
-  }, []);
+  }, [index]);
 
   const formatDate = (timestamp) => {
-    const date = new Date(timestamp * 1000);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    try {
+      const timestampNum = typeof timestamp === 'bigint' ? Number(timestamp) : timestamp;
+      if (!timestampNum || isNaN(timestampNum)) {
+        return 'Invalid Date';
+      }
+      const date = new Date(timestampNum * 1000);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Invalid Date';
+    }
+  };
+
+  // Validate post data
+  if (!post || !post.owner || !post.content) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={[styles.errorText, { color: colors.error }]}>Invalid post data</Text>
+      </View>
+    );
+  }
+
+  // Validate and clean imageHash
+  const getImageUrl = (imageHash) => {
+    if (!imageHash) return 'https://placehold.co/300x200';
+    // Check if it's already a raw hash (starts with 'Qm' and is 46 characters long)
+    if (/^Qm[1-9A-Za-z]{44}$/.test(imageHash)) {
+      return `https://gateway.pinata.cloud/ipfs/${imageHash}`;
+    }
+    // Handle full URLs
+    const match = imageHash.match(/ipfs\/(Qm[1-9A-Za-z]{44})/);
+    return match ? `https://gateway.pinata.cloud/ipfs/${match[1]}` : 'https://placehold.co/300x200';
   };
 
   return (
-    <Animated.View
-      style={[
-        styles.postCard,
-        {
-          backgroundColor: colors.surface,
-          transform: [{ scale: scaleAnim }],
-          opacity: opacityAnim,
-        },
-      ]}
-    >
-      <View style={[styles.cardGradient, { backgroundColor: colors.primary + '10' }]} />
-      
-      <View style={styles.postHeader}>
-        <View style={styles.userInfo}>
-          <View style={[styles.avatarContainer, { backgroundColor: colors.primary + '20' }]}>
-            <MaterialIcons name="person" size={24} color={colors.primary} />
-          </View>
-          <View style={styles.userDetails}>
-            <Text style={[styles.userName, { color: colors.text }]}>
-              {post.owner.slice(0, 6)}...{post.owner.slice(-4)}
-            </Text>
-            <Text style={[styles.postDate, { color: colors.textSecondary }]}>
-              {formatDate(post.timestamp)}
-            </Text>
+    <ErrorBoundary>
+      <Animated.View
+        style={[
+          styles.postCard,
+          {
+            backgroundColor: colors.surface,
+            transform: [{ scale: scaleAnim }],
+            opacity: opacityAnim,
+          },
+        ]}
+      >
+        <View style={[styles.cardGradient, { backgroundColor: colors.primary + '10' }]} />
+
+        <View style={styles.postHeader}>
+          <View style={styles.userInfo}>
+            <View style={[styles.avatarContainer, { backgroundColor: colors.primary + '20' }]}>
+              <MaterialIcons name="person" size={24} color={colors.primary} />
+            </View>
+            <View style={styles.userDetails}>
+              <Text style={[styles.userName, { color: colors.text }]}>
+                {post.owner.slice(0, 6)}...{post.owner.slice(-4)}
+              </Text>
+              <Text style={[styles.postDate, { color: colors.textSecondary }]}>
+                {formatDate(post.timestamp)}
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
 
-      <Text style={[styles.postContent, { color: colors.text }]}>
-        {post.content}
-      </Text>
+        <Text style={[styles.postContent, { color: colors.text }]}>
+          {post.content}
+        </Text>
 
-      {post.imageHash && (
-        <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: `https://gateway.pinata.cloud/ipfs/${post.imageHash}` }}
-            style={styles.postImage}
-            resizeMode="cover"
-          />
-        </View>
-      )}
-
-      <View style={styles.postFooter}>
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <MaterialIcons name="favorite" size={20} color={colors.primary} />
-            <Text style={[styles.statText, { color: colors.textSecondary }]}>
-              {post.likes.length}
-            </Text>
+        {post.imageHash && (
+          <View style={styles.imageContainer}>
+            <Image
+              source={{ uri: getImageUrl(post.imageHash) }}
+              style={styles.postImage}
+              resizeMode="cover"
+              onError={(e) => console.error('Image load error:', e.nativeEvent.error)}
+            />
           </View>
-          <View style={styles.statItem}>
-            <MaterialIcons name="chat-bubble-outline" size={20} color={colors.primary} />
-            <Text style={[styles.statText, { color: colors.textSecondary }]}>
-              {post.comments.length}
-            </Text>
+        )}
+
+        <View style={styles.postFooter}>
+          <View style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <MaterialIcons name="favorite" size={20} color={colors.primary} />
+              <Text style={[styles.statText, { color: colors.textSecondary }]}>
+                {(post.likes || []).length}
+              </Text>
+            </View>
+            <View style={styles.statItem}>
+              <MaterialIcons name="chat-bubble-outline" size={20} color={colors.primary} />
+              <Text style={[styles.statText, { color: colors.textSecondary }]}>
+                {(post.comments || []).length}
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
-    </Animated.View>
+      </Animated.View>
+    </ErrorBoundary>
   );
 };
 
@@ -124,8 +190,13 @@ const AllPostScreen = () => {
 
   useEffect(() => {
     const loadPosts = async () => {
-      await fetchMyPosts();
-      setLoading(false);
+      try {
+        await fetchMyPosts();
+      } catch (err) {
+        setError(err.message || 'Failed to load posts');
+      } finally {
+        setLoading(false);
+      }
     };
     loadPosts();
 
@@ -166,7 +237,7 @@ const AllPostScreen = () => {
         </View>
       ) : (
         <FlatList
-          data={myPosts}
+          data={myPosts || []}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item, index }) => <PostCard post={item} index={index} />}
           contentContainerStyle={styles.listContent}
@@ -177,9 +248,192 @@ const AllPostScreen = () => {
   );
 };
 
+// React Native version of PostScreen
+const PostScreen = ({ route }) => {
+  const { post } = route.params || {};
+  const { currentUserAddress, likePost, commentOnPost } = useContext(chatAppContext);
+  const { colors } = useTheme();
+  const [commentText, setCommentText] = useState('');
+  const [imageUrl, setImageUrl] = useState('https://placehold.co/300x200');
+  const [isLiked, setIsLiked] = useState(false);
+
+  const getRawHash = (imageHash) => {
+    if (!imageHash) return null;
+    // Check if it's already a raw hash
+    if (/^Qm[1-9A-Za-z]{44}$/.test(imageHash)) {
+      return imageHash;
+    }
+    // Extract hash from full URL
+    const match = imageHash.match(/ipfs\/(Qm[1-9A-Za-z]{44})/);
+    return match ? match[1] : null;
+  };
+
+  useEffect(() => {
+    const fetchImageData = async () => {
+      if (!post?.imageHash) {
+        console.log('No imageHash provided for post:', post);
+        return;
+      }
+
+      const rawHash = getRawHash(post.imageHash);
+      if (!rawHash) {
+        console.log('Invalid imageHash:', post.imageHash);
+        setImageUrl('https://placehold.co/300x200');
+        return;
+      }
+
+      // Try fetching JSON
+      try {
+        const url = `https://gateway.pinata.cloud/ipfs/${rawHash}`;
+        console.log('Fetching JSON from:', url);
+        const response = await fetch(url);
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Fetched JSON data:', data);
+          setImageUrl(data.image || data.imageUrl || 'https://placehold.co/300x200');
+          return;
+        } else {
+          console.error('Failed to fetch JSON:', response.status, response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching JSON:', error);
+      }
+
+      // Fallback to direct image URL
+      console.log('Attempting direct image URL:', `https://gateway.pinata.cloud/ipfs/${rawHash}`);
+      setImageUrl(`https://gateway.pinata.cloud/ipfs/${rawHash}`);
+    };
+
+    fetchImageData();
+  }, [post?.imageHash]);
+
+  const handleLike = () => {
+    if (post?.owner && post?.id) {
+      likePost(post.owner, post.id);
+      setIsLiked(!isLiked);
+    }
+  };
+
+  const handleComment = () => {
+    if (commentText.trim() === '' || !post?.owner || !post?.id) return;
+    commentOnPost(post.owner, post.id, commentText);
+    setCommentText('');
+  };
+
+  if (!post || !post.owner || !post.content) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={[styles.errorText, { color: colors.error }]}>Invalid post data</Text>
+      </View>
+    );
+  }
+
+  return (
+    <ErrorBoundary>
+      <View style={[styles.postScreenContainer, { backgroundColor: colors.background }]}>
+        <View style={[styles.postCard, { backgroundColor: colors.surface }]}>
+          <View style={[styles.cardGradient, { backgroundColor: colors.primary + '10' }]} />
+          <View style={styles.postHeader}>
+            <View style={styles.userInfo}>
+              <View style={[styles.avatarContainer, { backgroundColor: colors.primary + '20' }]}>
+                <MaterialIcons name="person" size={24} color={colors.primary} />
+              </View>
+              <View style={styles.userDetails}>
+                <Text style={[styles.userName, { color: colors.text }]}>
+                  {post.owner.slice(0, 6)}...{post.owner.slice(-4)}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          <Text style={[styles.postContent, { color: colors.text }]}>{post.content}</Text>
+
+          {post.imageHash && (
+            <View style={styles.imageContainer}>
+              <Image
+                source={{ uri: imageUrl }}
+                style={styles.postImage}
+                resizeMode="cover"
+                onError={(e) => console.error('Image load error:', e.nativeEvent.error)}
+              />
+            </View>
+          )}
+
+          <View style={styles.postFooter}>
+            <View style={styles.statsContainer}>
+              <View style={styles.statItem}>
+                <MaterialIcons name="favorite" size={20} color={isLiked ? colors.error : colors.primary} />
+                <Text style={[styles.statText, { color: colors.textSecondary }]}>
+                  {(post.likes || []).length}
+                </Text>
+              </View>
+              <View style={styles.statItem}>
+                <MaterialIcons name="chat-bubble-outline" size={20} color={colors.primary} />
+                <Text style={[styles.statText, { color: colors.textSecondary }]}>
+                  {(post.comments || []).length}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.actionContainer}>
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: isLiked ? colors.error + '20' : colors.primary + '20' }]}
+              onPress={handleLike}
+            >
+              <Text style={[styles.actionButtonText, { color: isLiked ? colors.error : colors.primary }]}>
+                Like
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.primary + '20' }]}>
+              <Text style={[styles.actionButtonText, { color: colors.primary }]}>Comment</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.commentInputContainer}>
+            <TextInput
+              style={[styles.commentInput, { borderColor: colors.border, color: colors.text }]}
+              placeholder="Write a comment..."
+              placeholderTextColor={colors.textSecondary}
+              value={commentText}
+              onChangeText={setCommentText}
+            />
+            <TouchableOpacity
+              style={[styles.commentButton, { backgroundColor: colors.primary }]}
+              onPress={handleComment}
+              disabled={commentText.trim() === ''}
+            >
+              <Text style={styles.commentButtonText}>Post</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.commentsSection}>
+            <Text style={[styles.commentsTitle, { color: colors.text }]}>Comments</Text>
+            {(post.comments || []).map((comment, index) => (
+              <View key={index} style={styles.comment}>
+                <Text style={[styles.commentText, { color: colors.text }]}>
+                  <Text style={{ fontWeight: '600' }}>
+                    {comment.commenter.slice(0, 6)}...{comment.commenter.slice(-4)}
+                  </Text>
+                  <Text> </Text>
+                  <Text>{comment.commentText}</Text>
+                </Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
+    </ErrorBoundary>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  postScreenContainer: {
+    flex: 1,
+    padding: 16,
   },
   header: {
     flexDirection: 'row',
@@ -214,7 +468,17 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: 'red',
+  },
+  retryButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#007AFF',
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   listContent: {
     paddingVertical: 16,
@@ -292,6 +556,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 12,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -305,6 +570,58 @@ const styles = StyleSheet.create({
   statText: {
     fontSize: 14,
     fontWeight: '500',
+  },
+  actionContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 12,
+  },
+  actionButton: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  actionButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  commentInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  commentInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 8,
+    fontSize: 14,
+  },
+  commentButton: {
+    padding: 10,
+    borderRadius: 8,
+  },
+  commentButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  commentsSection: {
+    marginTop: 8,
+  },
+  commentsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  comment: {
+    marginBottom: 8,
+  },
+  commentText: {
+    fontSize: 14,
+    lineHeight: 20,
   },
 });
 
