@@ -1,404 +1,302 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useContext, useState, useEffect } from "react";
 import {
   View,
   Text,
+    StyleSheet,
+    TouchableOpacity,
   TextInput,
-  TouchableOpacity,
-  Image,
   ScrollView,
-  StyleSheet,
-  Platform,
+    Alert,
   ActivityIndicator,
-  KeyboardAvoidingView,
-  SafeAreaView,
-  Animated,
-  Pressable,
-} from 'react-native';
-import { chatAppContext } from '../Context/ChatAppContext';
-import { useTheme } from '../Context/ThemeContext';
-import { MaterialIcons } from '@expo/vector-icons';
-import { converTime } from '../Utils/apiFeatures';
+} from "react-native";
+import { chatAppContext } from "../Context/ChatAppContext";
+import { useNavigation } from "@react-navigation/native";
+import { MaterialIcons } from "@expo/vector-icons";
 
-const ChatsScreen = ({
-  functionName,
-  friendMsg = [],
-  account,
-  username,
+const ChatsScreen = () => {
+    const {
+        friendLists,
+  friendMsg,
+        sendMessage,
+        readMessage,
+        checkMessages,
   loading,
-  currentUserName,
-  currentUserAddress,
-  selectedFriend,
-  readMessage,
-}) => {
-  const { userList } = useContext(chatAppContext);
-  const { colors } = useTheme();
-  const [message, setMessage] = useState('');
-  const [userImageUrl, setUserImageUrl] = useState('https://via.placeholder.com/100');
-  const [friendImageUrl, setFriendImageUrl] = useState('https://via.placeholder.com/100');
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const scrollViewRef = useRef(null);
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(-10)).current;
-  const scaleAnim = useRef(new Animated.Value(0.95)).current;
+        error,
+    } = useContext(chatAppContext);
+    const [selectedFriend, setSelectedFriend] = useState(null);
+    const [message, setMessage] = useState("");
+    const [hasMessages, setHasMessages] = useState(false);
+    const navigation = useNavigation();
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateY, {
-        toValue: 0,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        friction: 8,
-        tension: 40,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
+        if (selectedFriend) {
+            readMessage(selectedFriend);
+            }
+    }, [selectedFriend]);
 
-  useEffect(() => {
-    const fetchImages = async () => {
-      try {
-        const user = userList?.find(
-          (u) => u.accountAddress.toLowerCase() === currentUserAddress?.toLowerCase()
-        );
-        if (user?.imageHash) {
-          const res = await fetch(`https://gateway.pinata.cloud/ipfs/${user.imageHash}`);
-          const data = await res.json();
-          setUserImageUrl(data.image || userImageUrl);
+    useEffect(() => {
+        if (selectedFriend) {
+            checkMessages(selectedFriend).then(setHasMessages);
+            }
+    }, [selectedFriend, friendMsg]);
+
+    const handleSend = async () => {
+        if (!selectedFriend) {
+            Alert.alert("Error", "Please select a friend to chat with");
+            return;
         }
 
-        if (selectedFriend?.[0]) {
-          const friend = userList?.find(
-            (u) => u.accountAddress.toLowerCase() === selectedFriend[0].toLowerCase()
-          );
-          if (friend?.imageHash) {
-            const res = await fetch(`https://gateway.pinata.cloud/ipfs/${friend.imageHash}`);
-            const data = await res.json();
-            setFriendImageUrl(data.image || friendImageUrl);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching images:', error);
+        if (!message.trim()) {
+            Alert.alert("Error", "Message cannot be empty");
+        return;
       }
-    };
 
-    if (userList?.length > 0 && (currentUserAddress || selectedFriend)) {
-      fetchImages();
+        try {
+            await sendMessage({
+                msg: message,
+                address: selectedFriend,
+            });
+            setMessage("");
+        } catch (err) {
+            Alert.alert("Error", err.message || "Failed to send message");
     }
-  }, [userList, currentUserAddress, selectedFriend]);
-
-  useEffect(() => {
-    if (selectedFriend?.[0]) {
-      readMessage(selectedFriend[0]);
-    }
-  }, [selectedFriend]);
-
-  useEffect(() => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollToEnd({ animated: true });
-    }
-  }, [friendMsg]);
-
-  const handleSend = () => {
-    if (!selectedFriend?.[0] || !message.trim()) return;
-    functionName({ msg: message, address: selectedFriend[0] });
-    setMessage('');
   };
 
-  const renderMessageBubble = (msg, index, isFriend) => {
-    const imageSource = isFriend ? friendImageUrl : userImageUrl;
-    const name = isFriend ? selectedFriend[1] : username;
+    const renderMessage = (msg, index) => {
+        if (!msg || !msg.msg) return null;
 
+        const isSender = msg.sender === selectedFriend;
     return (
-      <Animated.View
-        key={index}
-        style={[
+            <View
+                key={index}
+                style={[
           styles.messageBubble,
-          isFriend ? styles.leftBubble : styles.rightBubble,
-          {
-            backgroundColor: isFriend ? colors.surface : colors.primary,
-            opacity: fadeAnim,
-            transform: [
-              { translateY },
-              { scale: scaleAnim }
-            ],
-          }
-        ]}
-      >
-        <Image source={{ uri: imageSource }} style={styles.avatarSmall} />
-        <View style={styles.messageContent}>
-          <View style={styles.messageHeader}>
-            <Text style={[styles.senderName, { color: colors.text }]}>
-              {name}
-            </Text>
-            <Text style={[styles.timestamp, { color: colors.textSecondary }]}>
-              {converTime(msg.timestamp)}
-            </Text>
-          </View>
-          <Text style={[styles.messageText, { color: isFriend ? colors.text : '#fff' }]}>
-            {msg.msg}
-          </Text>
-          {!isFriend && (
-            <View style={styles.messageStatus}>
-              <MaterialIcons name="done-all" size={16} color="#fff" />
-            </View>
-          )}
-        </View>
-      </Animated.View>
+          isSender ? styles.receivedMessage : styles.sentMessage,
+                ]}
+            >
+                <Text style={styles.messageText}>{msg.msg}</Text>
+                <Text style={styles.timestamp}>
+                    {new Date(msg.timestamp * 1000).toLocaleTimeString()}
+              </Text>
+      </View>
     );
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-      >
-        {selectedFriend?.[0] && (
-          <Animated.View 
-            style={[
-              styles.userInfo,
-              { 
-                backgroundColor: colors.surface,
-                opacity: fadeAnim,
-                transform: [{ translateY }],
-              }
-            ]}
-          >
-            <Image source={{ uri: friendImageUrl }} style={styles.avatarLarge} />
-            <View style={styles.userInfoText}>
-              <Text style={[styles.userName, { color: colors.text }]}>{selectedFriend[1]}</Text>
-              <Text style={[styles.userAddress, { color: colors.textSecondary }]}>
-                {selectedFriend[0].slice(0, 6)}...{selectedFriend[0].slice(-4)}
-              </Text>
+        <View style={styles.container}>
+            <View style={styles.header}>
+                <TouchableOpacity
+                    onPress={() => navigation.goBack()}
+                    style={styles.backButton}
+                >
+                    <MaterialIcons name="arrow-back" size={24} color="white" />
+                </TouchableOpacity>
+                <Text style={styles.headerTitle}>Chats</Text>
             </View>
-            <TouchableOpacity style={styles.menuButton}>
-              <MaterialIcons name="more-vert" size={24} color={colors.textSecondary} />
-            </TouchableOpacity>
-          </Animated.View>
-        )}
 
-        <ScrollView 
-          ref={scrollViewRef}
-          style={styles.messagesContainer}
-          contentContainerStyle={styles.messagesContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {Array.isArray(friendMsg) && friendMsg.map((msg, index) => {
-            const isFriend = msg.sender.toLowerCase() === selectedFriend?.[0]?.toLowerCase();
-            return renderMessageBubble(msg, index, isFriend);
-          })}
-        </ScrollView>
+            <View style={styles.content}>
+                <View style={styles.friendList}>
+                    {friendLists.map((friend, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            style={[
+                                styles.friendItem,
+                                selectedFriend === friend && styles.selectedFriend,
+                            ]}
+                            onPress={() => setSelectedFriend(friend)}
+                        >
+                            <Text style={styles.friendName}>
+                                {friend.slice(0, 6)}...{friend.slice(-4)}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
 
-        <View style={[styles.inputContainer, { backgroundColor: colors.surface }]}>
-          <TouchableOpacity 
-            style={styles.iconButton}
-            onPress={() => setShowEmojiPicker(!showEmojiPicker)}
-          >
-            <MaterialIcons name="emoji-emotions" size={24} color={colors.textSecondary} />
-          </TouchableOpacity>
+                <View style={styles.chatArea}>
+                    {loading ? (
+                        <View style={styles.loadingContainer}>
+                            <ActivityIndicator size="large" color="#6C5CE7" />
+                        </View>
+                    ) : error ? (
+                        <View style={styles.errorContainer}>
+                            <Text style={styles.errorText}>{error}</Text>
+                        </View>
+                    ) : !selectedFriend ? (
+                        <View style={styles.emptyContainer}>
+                            <Text style={styles.emptyText}>
+                                Select a friend to start chatting
+            </Text>
+          </View>
+                    ) : !hasMessages ? (
+                        <View style={styles.emptyContainer}>
+                            <Text style={styles.emptyText}>
+                                No messages yet. Start the conversation!
+                            </Text>
+        </View>
+                    ) : (
+                        <ScrollView style={styles.messageList}>
+                            {friendMsg.map(renderMessage)}
+      </ScrollView>
+                    )}
+
+                    {selectedFriend && (
+                        <View style={styles.inputContainer}>
           <TextInput
-            style={[styles.input, { color: colors.text }]}
-            placeholder="Type your message..."
-            placeholderTextColor={colors.textSecondary}
+                                style={styles.input}
             value={message}
             onChangeText={setMessage}
+                                placeholder="Type a message..."
+                                placeholderTextColor="#666"
+                                maxLength={500}
             multiline
-            maxLength={500}
           />
-          <TouchableOpacity style={styles.iconButton}>
-            <MaterialIcons name="attach-file" size={24} color={colors.textSecondary} />
+          <TouchableOpacity
+                                style={styles.sendButton}
+            onPress={handleSend}
+            disabled={loading || !message.trim()}
+          >
+                                <MaterialIcons
+                                    name="send"
+                                    size={24}
+                                    color={message.trim() ? "#6C5CE7" : "#999"}
+                                />
           </TouchableOpacity>
-          {loading ? (
-            <ActivityIndicator color={colors.primary} size="small" style={styles.sendButton} />
-          ) : (
-            <Pressable 
-              style={({ pressed }) => [
-                styles.sendButton, 
-                { 
-                  backgroundColor: colors.primary,
-                  transform: [{ scale: pressed ? 0.95 : 1 }],
-                },
-                !message.trim() && styles.sendButtonDisabled
-              ]} 
-              onPress={handleSend}
-              disabled={!message.trim()}
-            >
-              <MaterialIcons name="send" size={20} color="#fff" />
-            </Pressable>
-          )}
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      )}
+                </View>
+            </View>
+        </View>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
   container: {
     flex: 1,
+        backgroundColor: "#1A1A1A",
   },
-  userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 20,
+  header: {
+        flexDirection: "row",
+        alignItems: "center",
     padding: 16,
-    margin: 16,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
+        backgroundColor: "#2D2D2D",
+    borderBottomWidth: 1,
+        borderBottomColor: "#3D3D3D",
   },
-  userInfoText: {
+    backButton: {
+        marginRight: 16,
+  },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: "bold",
+        color: "white",
+    },
+    content: {
     flex: 1,
+        flexDirection: "row",
+    },
+    friendList: {
+        width: 120,
+        backgroundColor: "#2D2D2D",
+        borderRightWidth: 1,
+        borderRightColor: "#3D3D3D",
+    },
+    friendItem: {
+        padding: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: "#3D3D3D",
   },
-  avatarLarge: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    marginRight: 12,
-    borderWidth: 2,
-    borderColor: '#f99500',
+    selectedFriend: {
+        backgroundColor: "#3D3D3D",
+    },
+    friendName: {
+        color: "white",
+    fontSize: 12,
   },
-  userName: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  userAddress: {
-    fontSize: 14,
-  },
-  menuButton: {
-    padding: 8,
-  },
-  messagesContainer: {
+    chatArea: {
     flex: 1,
+        backgroundColor: "#1A1A1A",
   },
-  messagesContent: {
+    messageList: {
+        flex: 1,
     padding: 16,
-    paddingBottom: 24,
   },
   messageBubble: {
-    flexDirection: 'row',
-    marginVertical: 8,
-    maxWidth: '85%',
-    borderRadius: 20,
-    padding: 12,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
+        maxWidth: "80%",
+        padding: 12,
+    borderRadius: 16,
+        marginBottom: 8,
   },
-  leftBubble: {
-    alignSelf: 'flex-start',
-    borderBottomLeftRadius: 4,
-  },
-  rightBubble: {
-    alignSelf: 'flex-end',
+  sentMessage: {
+        backgroundColor: "#6C5CE7",
+        alignSelf: "flex-end",
     borderBottomRightRadius: 4,
   },
-  avatarSmall: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: '#fff',
-  },
-  messageContent: {
-    flex: 1,
-  },
-  messageHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  senderName: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  timestamp: {
-    fontSize: 12,
-    marginLeft: 8,
+    receivedMessage: {
+        backgroundColor: "#3D3D3D",
+        alignSelf: "flex-start",
+        borderBottomLeftRadius: 4,
   },
   messageText: {
+        color: "white",
     fontSize: 16,
-    lineHeight: 22,
-  },
-  messageStatus: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginTop: 4,
+    },
+    timestamp: {
+        color: "rgba(255, 255, 255, 0.6)",
+        fontSize: 10,
+        marginTop: 4,
+        alignSelf: "flex-end",
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
-  },
-  iconButton: {
-    padding: 8,
-    borderRadius: 20,
-    marginHorizontal: 4,
+        flexDirection: "row",
+        padding: 16,
+        backgroundColor: "#2D2D2D",
+    borderTopWidth: 1,
+        borderTopColor: "#3D3D3D",
   },
   input: {
     flex: 1,
-    fontSize: 16,
-    maxHeight: 100,
-    paddingHorizontal: 12,
+        backgroundColor: "#3D3D3D",
+        borderRadius: 20,
+        paddingHorizontal: 16,
     paddingVertical: 8,
-    marginHorizontal: 8,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.05)',
+        color: "white",
+        marginRight: 8,
+    maxHeight: 100,
   },
   sendButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 8,
-  },
-  sendButtonDisabled: {
-    opacity: 0.5,
+        backgroundColor: "#3D3D3D",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    errorContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 16,
+    },
+    errorText: {
+        color: "#FF6B6B",
+        textAlign: "center",
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 16,
+    },
+    emptyText: {
+        color: "#666",
+        textAlign: "center",
+        fontSize: 16,
   },
 });
 
-export default ChatsScreen;
+export default ChatsScreen; 

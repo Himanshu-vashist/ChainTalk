@@ -84,14 +84,25 @@ const UserCard = ({ el, sendFriendRequest, colors, index }) => {
         onPressOut={handlePressOut}
         activeOpacity={1}
       >
-        <View style={[styles.cardGradient, { backgroundColor: colors.primary + '10' }]} />
+        <View style={[styles.cardGradient, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.1)` }]} />
         <View style={styles.userInfo}>
           <View style={styles.imageContainer}>
             <Image 
-              source={{ uri: el.imageHash ? `https://gateway.pinata.cloud/ipfs/${el.imageHash}` : 'https://via.placeholder.com/100' }} 
-              style={styles.userImage}
+              source={{ 
+                uri: el.imageHash 
+                  ? `https://ipfs.io/ipfs/${el.imageHash}` 
+                  : 'https://via.placeholder.com/100'
+              }} 
+              style={[styles.userImage, { borderColor: colors.surface }]}
+              onError={(e) => {
+                console.log('Image loading error:', e.nativeEvent.error);
+                // Fallback to placeholder if image fails to load
+                e.target.setNativeProps({
+                  source: { uri: 'https://via.placeholder.com/100' }
+                });
+              }}
             />
-            <View style={[styles.statusIndicator, { backgroundColor: colors.primary }]} />
+            <View style={[styles.statusIndicator, { backgroundColor: colors.primary, borderColor: colors.surface }]} />
           </View>
           <View style={styles.userDetails}>
             <Text style={[styles.userName, { color: colors.primary }]}>{el.name}</Text>
@@ -113,7 +124,7 @@ const UserCard = ({ el, sendFriendRequest, colors, index }) => {
           onPressOut={handlePressOut}
           activeOpacity={0.8}
         >
-          <Text style={styles.addButtonText}>Add</Text>
+          <Text style={[styles.addButtonText, { color: colors.buttonText }]}>Add</Text>
         </TouchableOpacity>
       </TouchableOpacity>
     </Animated.View>
@@ -176,7 +187,7 @@ const AllUserScreen = () => {
         {/* Left Side - Discover Section */}
         <View style={styles.leftSection}>
           <View style={[styles.headerSection, { backgroundColor: colors.surface }]}>
-            <View style={[styles.headerGradient, { backgroundColor: colors.primary + '20' }]} />
+            <View style={[styles.headerGradient, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.2)` }]} />
             <Text style={[styles.heading, { color: colors.text }]}>
               Discover New Connections
             </Text>
@@ -185,7 +196,7 @@ const AllUserScreen = () => {
             </Text>
           </View>
 
-          <View style={[styles.searchContainer, { backgroundColor: colors.surface }]}>
+          <View style={[styles.searchContainer, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]}>
             <TextInput
               style={[styles.searchInput, { 
                 backgroundColor: colors.background,
@@ -220,7 +231,7 @@ const AllUserScreen = () => {
                 contentContainerStyle={styles.userListContent}
               />
             ) : (
-              <View style={[styles.noUsers, { backgroundColor: colors.surface }]}>
+              <View style={[styles.noUsers, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]}>
                 <Text style={[styles.noUsersText, { color: colors.textSecondary }]}>
                   {searchQuery ? 'No users found matching your search.' : 'No users available to add as friends.'}
                 </Text>
@@ -231,15 +242,15 @@ const AllUserScreen = () => {
 
         {/* Right Side - Personal Details */}
         <View style={styles.rightSection}>
-          <View style={[styles.currentUser, { backgroundColor: colors.surface }]}>
-            <View style={[styles.currentUserGradient, { backgroundColor: colors.primary + '10' }]} />
+          <View style={[styles.currentUser, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]}>
+            <View style={[styles.currentUserGradient, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.1)` }]} />
             {currentUserName && currentUserAddress ? (
               <>
                 <Text style={[styles.infoTitle, { color: colors.primary }]}>
                   Your Account Details
                 </Text>
                 <View style={styles.infoRow}>
-                  <View style={[styles.infoIcon, { backgroundColor: colors.primary + '20' }]}>
+                  <View style={[styles.infoIcon, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.2)` }]}>
                     <Text style={[styles.infoIconText, { color: colors.primary }]}>👤</Text>
                   </View>
                   <View style={styles.infoContent}>
@@ -248,8 +259,8 @@ const AllUserScreen = () => {
                   </View>
                 </View>
                 <View style={styles.infoRow}>
-                  <View style={[styles.infoIcon, { backgroundColor: colors.primary + '20' }]}>
-                    <Text style={[styles.infoIconText, { color: colors.primary }]}>🏷</Text>
+                  <View style={[styles.infoIcon, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.2)` }]}>
+                    <Text style={[styles.infoIconText, { color: colors.primary }]}>🏠</Text>
                   </View>
                   <View style={styles.infoContent}>
                     <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Address</Text>
@@ -258,10 +269,32 @@ const AllUserScreen = () => {
                     </Text>
                   </View>
                 </View>
+                <View style={styles.infoRow}>
+                  <View style={[styles.infoIcon, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.2)` }]}>
+                    <Text style={[styles.infoIconText, { color: colors.primary }]}>💬</Text>
+                  </View>
+                  <View style={styles.infoContent}>
+                    <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Friend Requests</Text>
+                    <Text style={[styles.infoValue, { color: colors.text }]}>
+                      {sendFriendRequest ? 'Active' : 'Inactive'}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.infoRow}>
+                  <View style={[styles.infoIcon, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.2)` }]}>
+                    <Text style={[styles.infoIconText, { color: colors.primary }]}>💲</Text>
+                  </View>
+                  <View style={styles.infoContent}>
+                    <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Reward Tokens</Text>
+                    <Text style={[styles.infoValue, { color: colors.text }]}>
+                      0
+                    </Text>
+                  </View>
+                </View>
               </>
             ) : (
-              <Text style={[styles.noAccount, { color: colors.textSecondary }]}>
-                Your account is not created yet.
+              <Text style={[styles.noAccountText, { color: colors.textSecondary }]}>
+                Connect your wallet to see account details
               </Text>
             )}
           </View>
@@ -412,7 +445,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
-  noAccount: {
+  noAccountText: {
     fontSize: 16,
     textAlign: 'center',
   },
@@ -515,26 +548,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: '600',
-  },
-  noUsers: {
-    borderRadius: 24,
-    padding: 24,
-    alignItems: 'center',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
-  },
-  noUsersText: {
-    fontSize: 16,
-    textAlign: 'center',
   },
   errorContainer: {
     borderRadius: 24,

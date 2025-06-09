@@ -40,6 +40,7 @@ const Navbar = ({ navigation, route }) => {
   const { isDarkMode, toggleTheme, colors } = useTheme();
   const [openModel, setOpenModel] = useState(false);
   const [hoveredItem, setHoveredItem] = useState(null);
+  const [activeItem, setActiveItem] = useState(route?.name);
 
   const handleProfilePress = () => {
     navigation.navigate('ProfileStack', {
@@ -47,8 +48,18 @@ const Navbar = ({ navigation, route }) => {
     });
   };
 
+  const handleNavigation = (path) => {
+    setActiveItem(path);
+    navigation.navigate(path);
+  };
+
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[
+      styles.container, 
+      { 
+        backgroundColor: colors.background, 
+      }
+    ]}>
       <View style={styles.innerContainer}>
         <View style={[styles.logoContainer, { backgroundColor: colors.surface }]}>
           <Image source={images.avatar1} style={styles.logo} resizeMode="contain" />
@@ -60,26 +71,38 @@ const Navbar = ({ navigation, route }) => {
           showsHorizontalScrollIndicator={false}
         >
           {menuItems.map((el, i) => {
-            const isActive = route?.name === el.path;
+            const isActive = activeItem === el.path;
+            const isHovered = hoveredItem === i;
+
             return (
               <TouchableOpacity
                 key={i}
-                onPress={() => navigation.navigate(el.path)}
-                style={[
-                  styles.menuItemContainer,
-                  isActive && styles.activeMenuItemContainer,
-                  hoveredItem === i && styles.hoveredMenuItemContainer,
-                  { backgroundColor: isActive ? colors.primary + '20' : 'transparent' }
-                ]}
+                onPress={() => handleNavigation(el.path)}
                 onMouseEnter={() => Platform.OS === 'web' && setHoveredItem(i)}
                 onMouseLeave={() => Platform.OS === 'web' && setHoveredItem(null)}
+                style={[
+                  styles.menuItemContainer,
+                  {
+                    backgroundColor: isActive
+                      ? colors.activeBackground 
+                      : isHovered
+                      ? colors.hoverBackground 
+                      : 'transparent',
+                  }
+                ]}
               >
-                <Text style={[
-                  styles.menuItem,
-                  { color: colors.text },
-                  isActive && { color: colors.primary },
-                  hoveredItem === i && { color: colors.primary },
-                ]}>
+                <Text
+                  style={[
+                    styles.menuItemText,
+                    {
+                      color: isActive
+                        ? colors.buttonText 
+                        : isHovered
+                        ? colors.primary 
+                        : colors.text,
+                    }
+                  ]}
+                >
                   {el.menu}
                 </Text>
               </TouchableOpacity>
@@ -102,14 +125,13 @@ const Navbar = ({ navigation, route }) => {
               onPress={connectWallet} 
               style={[styles.button, styles.connectButton, { backgroundColor: colors.primary }]}
             >
-              <Text style={[styles.buttonText, { color: '#fff' }]}>Connect Wallet</Text>
+              <Text style={[styles.buttonText, { color: colors.buttonText }]}>Connect Wallet</Text>
             </TouchableOpacity>
           ) : !currentUserName ? (
             <TouchableOpacity 
               onPress={() => setOpenModel(true)} 
               style={[styles.button, styles.createAccountButton, { 
                 backgroundColor: colors.surface,
-                borderColor: colors.primary 
               }]}
             >
               <Image source={images.create2} style={styles.avatar} />
@@ -140,10 +162,9 @@ const Navbar = ({ navigation, route }) => {
       </View>
 
       {openModel && (
-        <View style={[styles.modal, { 
-          backgroundColor: colors.background + 'F0',
-          borderTopColor: colors.border 
-        }]}>
+        <View style={[
+          styles.modal,
+        ]}>
           <ModelScreen
             openBox={setOpenModel}
             title="WELCOME TO"
@@ -200,24 +221,19 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     marginHorizontal: 4,
-    transition: 'all 0.3s ease',
+    transition: 'all 0.2s ease',
+    minWidth: 80,
+    alignItems: 'center',
+    position: 'relative',
+    overflow: 'hidden',
   },
-  activeMenuItemContainer: {
-    backgroundColor: 'rgba(255, 149, 0, 0.1)',
-  },
-  hoveredMenuItemContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  menuItem: {
+  menuItemText: { 
     fontSize: 15,
     fontWeight: '500',
-    transition: 'all 0.3s ease',
-  },
-  activeMenuItem: {
-    fontWeight: '600',
-  },
-  hoveredMenuItem: {
-    color: 'rgb(255, 149, 0)',
+    transition: 'all 0.2s ease',
+    textAlign: 'center',
+    position: 'relative',
+    zIndex: 1,
   },
   walletContainer: {
     flexDirection: 'row',
@@ -228,7 +244,6 @@ const styles = StyleSheet.create({
   themeButton: {
     padding: 8,
     borderRadius: 8,
-    marginRight: 8,
   },
   themeButtonText: {
     fontSize: 18,
@@ -243,41 +258,69 @@ const styles = StyleSheet.create({
     transition: 'all 0.3s ease',
   },
   connectButton: {
-    backgroundColor: 'rgb(255, 149, 0)',
+    // No specific background here, as it's applied inline
   },
   createAccountButton: {
     borderWidth: 1,
   },
+  avatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+  },
   userContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 8,
-    borderRadius: 20,
+    borderRadius: 12,
     gap: 8,
-    cursor: 'pointer',
+    transition: 'all 0.3s ease',
   },
   username: {
     fontSize: 14,
-    fontWeight: '600',
-    marginHorizontal: 8,
-  },
-  avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 2,
+    fontWeight: '500',
   },
   modal: {
     position: 'absolute',
-    top: Platform.OS === 'web' ? 70 : 100,
+    top: 0,
     left: 0,
     right: 0,
-    zIndex: 1000,
-    backdropFilter: 'blur(10px)',
-    justifyContent: 'center',
+    bottom: 0,
+    zIndex: 100,
     alignItems: 'center',
-    padding: 20,
+    justifyContent: 'center',
     borderTopWidth: 1,
+  },
+  modelContent: {
+    padding: 20,
+    borderRadius: 10,
+    width: '90%',
+    maxWidth: 500,
+  },
+  errorMessageContainer: {
+    position: 'absolute',
+    top: Platform.OS === 'web' ? 80 : 100,
+    left: 20,
+    right: 20,
+    padding: 10,
+    borderRadius: 8,
+    zIndex: 1000,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+  },
+  errorMessageText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  closeErrorButton: {
+    position: 'absolute',
+    right: 10,
+    padding: 5,
+  },
+  closeErrorButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 

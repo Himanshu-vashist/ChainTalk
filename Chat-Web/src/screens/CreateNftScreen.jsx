@@ -5,14 +5,12 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Image,
   ScrollView,
   ActivityIndicator,
   Platform,
   Animated,
   KeyboardAvoidingView,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
 import { chatAppContext } from "../Context/ChatAppContext";
 import { useTheme } from '../Context/ThemeContext';
@@ -25,7 +23,6 @@ const CreateNFTScreen = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [image, setImage] = useState(null);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(-10)).current;
@@ -52,27 +49,14 @@ const CreateNFTScreen = () => {
     ]).start();
   }, []);
 
-  const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-  };
-
   const handleCreate = async () => {
-    if (!image || !title || !description || !price) {
-      alert("Please fill in all fields and select an image");
+    if (!title || !description || !price) {
+      alert("Please fill in all fields");
       return;
     }
 
     try {
-      await createNFT(image, title, description, price);
+      await createNFT(title, description, price);
       navigation.goBack();
     } catch (err) {
       console.error("Error creating NFT:", err);
@@ -118,22 +102,6 @@ const CreateNFTScreen = () => {
             },
           ]}
         >
-          <TouchableOpacity
-            style={[styles.imagePicker, { backgroundColor: colors.surface }]}
-            onPress={pickImage}
-          >
-            {image ? (
-              <Image source={{ uri: image }} style={styles.previewImage} />
-            ) : (
-              <View style={[styles.placeholderContainer, { backgroundColor: colors.primary + '10' }]}>
-                <MaterialIcons name="add-photo-alternate" size={48} color={colors.primary} />
-                <Text style={[styles.placeholderText, { color: colors.textSecondary }]}>
-                  Select an image
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
-
           <View style={styles.inputContainer}>
             <Text style={[styles.label, { color: colors.text }]}>Title</Text>
             <TextInput
@@ -250,37 +218,6 @@ const styles = StyleSheet.create({
   formContainer: {
     gap: 16,
   },
-  imagePicker: {
-    width: '100%',
-    height: 200,
-    borderRadius: 16,
-    overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
-  },
-  previewImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  placeholderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8,
-  },
-  placeholderText: {
-    fontSize: 16,
-  },
   inputContainer: {
     gap: 8,
   },
@@ -290,39 +227,38 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 48,
-    borderRadius: 12,
-    paddingHorizontal: 16,
+    borderRadius: 8,
     borderWidth: 1,
+    paddingHorizontal: 12,
     fontSize: 16,
   },
   textArea: {
     height: 120,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingTop: 12,
+    borderRadius: 8,
     borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingTop: 12,
     fontSize: 16,
     textAlignVertical: 'top',
   },
   errorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
+    padding: 12,
+    borderRadius: 8,
     gap: 8,
   },
   errorText: {
     fontSize: 14,
-    fontWeight: '500',
+    flex: 1,
   },
   createButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: 12,
+    height: 48,
+    borderRadius: 24,
     gap: 8,
-    marginTop: 8,
   },
   createButtonText: {
     color: '#fff',

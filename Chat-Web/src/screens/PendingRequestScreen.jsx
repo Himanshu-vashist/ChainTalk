@@ -9,9 +9,13 @@ import {
   Animated,
   FlatList,
   Platform,
+  Dimensions,
 } from 'react-native';
 import { chatAppContext } from '../Context/ChatAppContext';
 import { useTheme } from '../Context/ThemeContext';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const CARD_WIDTH = (SCREEN_WIDTH - 48) / 2; // 2 cards per row with padding
 
 const PendingRequestCard = ({ user, imageUrl, index, acceptFriendRequest, rejectRequest, colors }) => {
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
@@ -63,6 +67,7 @@ const PendingRequestCard = ({ user, imageUrl, index, acceptFriendRequest, reject
         {
           transform: [{ scale: scaleAnim }],
           opacity: opacityAnim,
+          width: CARD_WIDTH,
         },
       ]}
     >
@@ -75,19 +80,19 @@ const PendingRequestCard = ({ user, imageUrl, index, acceptFriendRequest, reject
           }
         ]}
       >
-        <View style={[styles.cardGradient, { backgroundColor: colors.primary + '10' }]} />
+        <View style={[styles.cardGradient, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.1)` }]} />
         <View style={styles.userInfo}>
           <View style={styles.imageContainer}>
             <Image 
               source={{ uri: imageUrl }} 
-              style={styles.userImage}
+              style={[styles.userImage, { borderColor: colors.surface }]}
             />
-            <View style={[styles.statusIndicator, { backgroundColor: colors.primary }]} />
+            <View style={[styles.statusIndicator, { backgroundColor: colors.primary, borderColor: colors.surface }]} />
           </View>
           <View style={styles.userDetails}>
-            <Text style={[styles.userName, { color: colors.primary }]}>{user?.name || 'Unknown User'}</Text>
-            <Text style={[styles.userAddress, { color: colors.textSecondary }]}>
-              {user?.accountAddress.slice(0, 6)}...{user?.accountAddress.slice(-4)}
+            <Text style={[styles.userName, { color: colors.primary }]} numberOfLines={1}>{user?.name || 'Unknown User'}</Text>
+            <Text style={[styles.userAddress, { color: colors.textSecondary }]} numberOfLines={1}>
+              {user?.accountAddress.slice(0, 4)}...{user?.accountAddress.slice(-4)}
             </Text>
           </View>
         </View>
@@ -103,7 +108,7 @@ const PendingRequestCard = ({ user, imageUrl, index, acceptFriendRequest, reject
             onPressOut={handlePressOut}
             activeOpacity={0.8}
           >
-            <Text style={styles.buttonText}>Accept</Text>
+            <Text style={[styles.buttonText, { color: colors.buttonText }]}>Accept</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[
@@ -116,7 +121,7 @@ const PendingRequestCard = ({ user, imageUrl, index, acceptFriendRequest, reject
             onPressOut={handlePressOut}
             activeOpacity={0.8}
           >
-            <Text style={styles.buttonText}>Reject</Text>
+            <Text style={[styles.buttonText, { color: colors.buttonText }]}>Reject</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -159,13 +164,22 @@ const PendingRequestScreen = () => {
 
         if (user?.imageHash && !userImages[address]) {
           try {
-            const url = `https://gateway.pinata.cloud/ipfs/${user.imageHash}`;
+            const url = `https://ipfs.io/ipfs/${user.imageHash}`;
+            const response = await fetch(url);
+            if (!response.ok) {
+              throw new Error('Failed to fetch image data');
+            }
+            const data = await response.json();
             setUserImages((prev) => ({
               ...prev,
-              [address]: url,
+              [address]: data.image || 'https://via.placeholder.com/100',
             }));
           } catch (error) {
             console.error(`Image fetch failed for ${address}:`, error);
+            setUserImages((prev) => ({
+              ...prev,
+              [address]: 'https://via.placeholder.com/100',
+            }));
           }
         }
       }
@@ -187,17 +201,17 @@ const PendingRequestScreen = () => {
     >
       <View style={styles.mainContent}>
         <View style={[styles.headerSection, { backgroundColor: colors.surface }]}>
-          <View style={[styles.headerGradient, { backgroundColor: colors.primary + '20' }]} />
+          <View style={[styles.headerGradient, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.2)` }]} />
           <Text style={[styles.heading, { color: colors.text }]}>
-            Pending Friend Requests
+            Pending Requests
           </Text>
           <Text style={[styles.subHeading, { color: colors.textSecondary }]}>
-            {pendingRequests.length} request{pendingRequests.length !== 1 ? 's' : ''} waiting for your response
+            {pendingRequests.length} request{pendingRequests.length !== 1 ? 's' : ''} waiting
           </Text>
         </View>
 
         {pendingRequests.length === 0 ? (
-          <View style={[styles.emptyContainer, { backgroundColor: colors.surface }]}>
+          <View style={[styles.emptyContainer, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]}>
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
               No pending requests at the moment.
             </Text>
@@ -221,7 +235,9 @@ const PendingRequestScreen = () => {
                 />
               );
             }}
+            numColumns={2}
             contentContainerStyle={styles.listContent}
+            columnWrapperStyle={styles.columnWrapper}
           />
         )}
       </View>
@@ -275,15 +291,18 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   listContent: {
-    paddingVertical: 16,
-    gap: 16,
+    paddingVertical: 8,
+  },
+  columnWrapper: {
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
   },
   requestCardContainer: {
     marginBottom: 16,
   },
   requestCard: {
     borderRadius: 16,
-    padding: 16,
+    padding: 12,
     overflow: 'hidden',
     ...Platform.select({
       ios: {
@@ -306,51 +325,51 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   userInfo: {
-    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   imageContainer: {
     position: 'relative',
-    marginRight: 16,
+    marginBottom: 8,
   },
   userImage: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     borderWidth: 2,
-    borderColor: '#fff',
   },
   statusIndicator: {
     position: 'absolute',
     bottom: 0,
     right: 0,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
     borderWidth: 2,
-    borderColor: '#fff',
   },
   userDetails: {
-    flex: 1,
+    alignItems: 'center',
+    width: '100%',
   },
   userName: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     marginBottom: 2,
+    textAlign: 'center',
   },
   userAddress: {
     fontSize: 12,
+    textAlign: 'center',
   },
   buttonContainer: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 8,
   },
   actionButton: {
     flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 16,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 12,
     alignItems: 'center',
     ...Platform.select({
       ios: {
@@ -365,7 +384,6 @@ const styles = StyleSheet.create({
     }),
   },
   buttonText: {
-    color: '#fff',
     fontSize: 12,
     fontWeight: '600',
   },

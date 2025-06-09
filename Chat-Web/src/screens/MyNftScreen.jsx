@@ -266,21 +266,21 @@ const styles = StyleSheet.create({
   },
   nftInfo: {
     padding: 16,
+    gap: 8,
   },
   nftTitle: {
     fontSize: 18,
     fontWeight: '600',
-    marginBottom: 4,
   },
   nftDescription: {
     fontSize: 14,
     lineHeight: 20,
-    marginBottom: 12,
   },
   nftDetails: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginTop: 8,
   },
   priceContainer: {
     flexDirection: 'row',
@@ -289,14 +289,14 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '500',
   },
   sellButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: 8,
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+    borderRadius: 20,
     gap: 4,
   },
   sellButtonText: {
@@ -311,28 +311,25 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    marginTop: 8,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
     gap: 16,
+    padding: 16,
   },
   errorText: {
     fontSize: 16,
     textAlign: 'center',
-    lineHeight: 22,
   },
   retryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 12,
+    paddingHorizontal: 24,
+    borderRadius: 24,
     gap: 8,
-    marginTop: 8,
   },
   retryButtonText: {
     color: '#fff',
@@ -343,22 +340,20 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
     gap: 16,
+    padding: 16,
   },
   emptyText: {
     fontSize: 16,
     textAlign: 'center',
-    lineHeight: 22,
   },
   createButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 12,
+    paddingHorizontal: 24,
+    borderRadius: 24,
     gap: 8,
-    marginTop: 8,
   },
   createButtonText: {
     color: '#fff',

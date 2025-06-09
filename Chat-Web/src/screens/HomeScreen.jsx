@@ -75,7 +75,7 @@ const HomeScreen = ({ navigation }) => {
       onPress={onPress}
       activeOpacity={0.8}
     >
-      <View style={[styles.quickActionIcon, { backgroundColor: colors.primary + '15' }]}>
+      <View style={[styles.quickActionIcon, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.15)` }]}>
         <MaterialIcons name={icon} size={24} color={colors.primary} />
       </View>
       <Text style={[styles.quickActionText, { color: colors.text }]}>{title}</Text>
@@ -117,8 +117,8 @@ const HomeScreen = ({ navigation }) => {
                   onPress={() => navigation.navigate('AllUsers')}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.getStartedText}>Connect Wallet</Text>
-                  <MaterialIcons name="account-balance-wallet" size={20} color="#fff" style={styles.btnIcon} />
+                  <Text style={[styles.getStartedText, { color: colors.buttonText }]}>Connect Wallet</Text>
+                  <MaterialIcons name="account-balance-wallet" size={20} color={colors.buttonText} style={styles.btnIcon} />
                 </TouchableOpacity>
               ) : !currentUserName ? (
                 <TouchableOpacity 
@@ -126,8 +126,8 @@ const HomeScreen = ({ navigation }) => {
                   onPress={() => navigation.navigate('AllUsers')}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.getStartedText}>Create Account</Text>
-                  <MaterialIcons name="person-add" size={20} color="#fff" style={styles.btnIcon} />
+                  <Text style={[styles.getStartedText, { color: colors.buttonText }]}>Create Account</Text>
+                  <MaterialIcons name="person-add" size={20} color={colors.buttonText} style={styles.btnIcon} />
                 </TouchableOpacity>
               ) : (
                 <View style={styles.quickActionsContainer}>
@@ -250,70 +250,61 @@ const FeatureCard = ({ image, title, description, colors, icon }) => (
       }
     ]}
   >
-    <View style={styles.featureImageContainer}>
-      <Image source={image} style={styles.featureImage} />
-      <View style={[styles.iconOverlay, { backgroundColor: colors.primary }]}>
-        <Text style={styles.iconText}>{icon}</Text>
-      </View>
+    <View style={[styles.featureIconContainer, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.15)` }]}>
+      <Text style={styles.featureIcon}>{icon}</Text>
     </View>
-    <View style={styles.featureContent}>
-      <Text style={[styles.featureTitle, { color: colors.primary }]}>{title}</Text>
-      <Text style={[styles.featureDesc, { color: colors.textSecondary }]}>{description}</Text>
-    </View>
+    <Text style={[styles.featureTitle, { color: colors.text }]}>{title}</Text>
+    <Text style={[styles.featureDescription, { color: colors.textSecondary }]}>{description}</Text>
   </Animated.View>
 );
 
 const StatItem = ({ icon, value, label, colors }) => (
-  <View style={[styles.statItem, { backgroundColor: colors.background }]}>
-    <MaterialIcons name={icon} size={24} color={colors.primary} />
-    <Text style={[styles.statValue, { color: colors.text }]}>{value}</Text>
+  <View style={styles.statItem}>
+    <View style={[styles.statIconContainer, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.2)` }]}>
+      <MaterialIcons name={icon} size={28} color={colors.primary} />
+    </View>
+    <Text style={[styles.statValue, { color: colors.primary }]}>{value}</Text>
     <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{label}</Text>
   </View>
 );
 
 const BenefitItem = ({ icon, title, description, colors }) => (
-  <Animated.View 
-    style={[
-      styles.benefitItem, 
-      { 
-        backgroundColor: colors.background,
-        transform: [{ scale: 1 }],
-      }
-    ]}
-  >
-    <View style={[styles.benefitIconContainer, { backgroundColor: colors.primary + '15' }]}>
-      <Text style={styles.benefitIcon}>{icon}</Text>
+  <View style={styles.benefitItem}>
+    <View style={[styles.benefitIconContainer, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.2)` }]}>
+      <Text style={[styles.benefitIcon, { color: colors.primary }]}>{icon}</Text>
     </View>
-    <Text style={[styles.benefitTitle, { color: colors.text }]}>{title}</Text>
-    <Text style={[styles.benefitDesc, { color: colors.textSecondary }]}>{description}</Text>
-  </Animated.View>
+    <Text style={[styles.benefitTitle, { color: colors.primary }]}>{title}</Text>
+    <Text style={[styles.benefitDescription, { color: colors.textSecondary }]}>{description}</Text>
+  </View>
 );
 
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
+    padding: 16,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    flexGrow: 1,
+    paddingBottom: 20,
   },
   content: {
     flex: 1,
   },
   heroSection: {
+    borderRadius: 24,
     padding: 24,
-    paddingTop: Platform.OS === 'ios' ? 60 : 24,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
-    marginBottom: 16,
+    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4.65,
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
       },
       android: {
         elevation: 8,
@@ -321,59 +312,61 @@ const styles = StyleSheet.create({
     }),
   },
   heroText: {
-    alignItems: 'center',
-    marginBottom: 24,
+    flex: 1,
+    marginRight: 20,
   },
   title: {
-    fontSize: 36,
+    fontSize: 32,
     fontWeight: 'bold',
-    textAlign: 'center',
-    letterSpacing: 0.5,
+    marginBottom: 8,
   },
   highlight: {
-    fontWeight: '800',
+    // color will be applied dynamically
   },
   subtitle: {
     fontSize: 16,
-    textAlign: 'center',
-    marginTop: 8,
-    marginBottom: 24,
     lineHeight: 24,
+    marginBottom: 20,
   },
   getStartedBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 25,
-    marginBottom: 16,
+    paddingHorizontal: 20,
+    borderRadius: 16,
+    marginTop: 10,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   getStartedText: {
-    color: '#fff',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
     marginRight: 8,
   },
   btnIcon: {
-    marginLeft: 4,
-  },
-  heroImage: {
-    width: screenWidth * 0.8,
-    height: screenWidth * 0.8,
-    marginTop: 16,
+    // color will be applied dynamically
   },
   quickActionsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
     gap: 12,
-    marginTop: 16,
+    marginTop: 10,
   },
   quickAction: {
+    flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderRadius: 16,
-    width: (screenWidth - 80) / 2,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -387,16 +380,22 @@ const styles = StyleSheet.create({
     }),
   },
   quickActionIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
-    marginBottom: 8,
+    justifyContent: 'center',
+    marginRight: 12,
   },
   quickActionText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '500',
+  },
+  heroImage: {
+    width: screenWidth * 0.4,
+    height: screenWidth * 0.4,
+    maxHeight: 200,
+    maxWidth: 200,
   },
   featuresSection: {
     padding: 16,

@@ -53,7 +53,7 @@ const FriendPostScreen = () => {
       <View style={[styles.header, { backgroundColor: colors.surface }]}>
         <TouchableOpacity
           style={[styles.backButton, { backgroundColor: colors.primary + '10' }]}
-          onPress={() => navigation.navigate('TotalPost')}
+          onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
           <MaterialIcons name="arrow-back-ios" size={20} color={colors.primary} />

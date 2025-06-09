@@ -22,7 +22,8 @@ const CreatePostScreen = () => {
   const { createPost } = useContext(chatAppContext);
   const { colors } = useTheme();
   const [content, setContent] = useState('');
-  const [image, setImage] = useState(null);
+  const [originalImage, setOriginalImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
   const [uploading, setUploading] = useState(false);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -50,7 +51,7 @@ const CreatePostScreen = () => {
     ]).start();
   }, []);
 
-  const pickImage = async () => {
+  const pickImage = async (type) => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
       Alert.alert('Permission required', 'Please grant media permissions to pick an image.');
@@ -63,7 +64,11 @@ const CreatePostScreen = () => {
       aspect: [4, 3],
     });
     if (!result.canceled) {
-      setImage(result.assets[0]);
+      if (type === 'original') {
+        setOriginalImage(result.assets[0]);
+      } else if (type === 'preview') {
+        setPreviewImage(result.assets[0]);
+      }
     }
   };
 
@@ -99,13 +104,23 @@ const CreatePostScreen = () => {
       Alert.alert('Validation', 'Post content cannot be empty.');
       return;
     }
+    if (!originalImage) {
+        Alert.alert('Validation', 'Please select an original image for your post.');
+        return;
+    }
     setUploading(true);
     try {
-      let imageUrl = '';
-      if (image) imageUrl = await uploadToPinata(image.uri);
-      await createPost(content, imageUrl);
+      let originalImageUrl = '';
+      if (originalImage) originalImageUrl = await uploadToPinata(originalImage.uri);
+      
+      // Preview image is uploaded but its hash is not sent to the smart contract
+      let previewImageUrl = '';
+      if (previewImage) previewImageUrl = await uploadToPinata(previewImage.uri);
+
+      await createPost(content, originalImageUrl); // Only original image hash sent to contract
       setContent('');
-      setImage(null);
+      setOriginalImage(null);
+      setPreviewImage(null);
       Alert.alert('Success', 'Post created successfully.');
     } catch (err) {
       Alert.alert('Error', err.message);
@@ -165,12 +180,22 @@ const CreatePostScreen = () => {
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={[styles.imagePicker, { backgroundColor: colors.primary }]}
-                onPress={pickImage}
+                onPress={() => pickImage('original')}
                 activeOpacity={0.8}
               >
-                <MaterialIcons name="add-photo-alternate" size={20} color="#fff" />
+                <MaterialIcons name="image" size={20} color="#fff" />
                 <Text style={styles.imagePickerText}>
-                  {image ? 'Change' : 'Add Photo'}
+                  {originalImage ? 'Change Original Image' : 'Add Original Image'}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.imagePicker, { backgroundColor: colors.secondary }]}
+                onPress={() => pickImage('preview')}
+                activeOpacity={0.8}
+              >
+                <MaterialIcons name="collections" size={20} color="#fff" />
+                <Text style={styles.imagePickerText}>
+                  {previewImage ? 'Change Preview Image' : 'Add Preview Image'}
                 </Text>
               </TouchableOpacity>
 
@@ -181,7 +206,7 @@ const CreatePostScreen = () => {
                   uploading && styles.postButtonDisabled,
                 ]}
                 onPress={handlePost}
-                disabled={uploading}
+                disabled={uploading || !originalImage}
                 activeOpacity={0.8}
               >
                 {uploading ? (
@@ -195,16 +220,34 @@ const CreatePostScreen = () => {
               </TouchableOpacity>
             </View>
 
-            {image && (
+            {originalImage && (
               <View style={styles.imagePreviewContainer}>
+                <Text style={[styles.previewLabel, { color: colors.text }]}>Original Image Preview:</Text>
                 <Image
-                  source={{ uri: image.uri }}
+                  source={{ uri: originalImage.uri }}
                   style={styles.previewImage}
                   resizeMode="cover"
                 />
                 <TouchableOpacity
                   style={[styles.removeImage, { backgroundColor: colors.error }]}
-                  onPress={() => setImage(null)}
+                  onPress={() => setOriginalImage(null)}
+                >
+                  <Text style={styles.removeImageText}>×</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {previewImage && (
+              <View style={styles.imagePreviewContainer}>
+                <Text style={[styles.previewLabel, { color: colors.text }]}>Preview Image Preview:</Text>
+                <Image
+                  source={{ uri: previewImage.uri }}
+                  style={styles.previewImage}
+                  resizeMode="cover"
+                />
+                <TouchableOpacity
+                  style={[styles.removeImage, { backgroundColor: colors.error }]}
+                  onPress={() => setPreviewImage(null)}
                 >
                   <Text style={styles.removeImageText}>×</Text>
                 </TouchableOpacity>
@@ -251,144 +294,120 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
-    opacity: 0.5,
+    height: '60%',
+    borderBottomLeftRadius: 50,
+    borderBottomRightRadius: 50,
   },
   heading: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: '700',
     marginBottom: 8,
-    textAlign: 'center',
   },
   highlight: {
-    fontWeight: 'bold',
+    // color will be set by theme
   },
   subHeading: {
     fontSize: 16,
     textAlign: 'center',
-    lineHeight: 22,
+    paddingHorizontal: 20,
   },
   contentSection: {
     borderRadius: 24,
-    padding: 24,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
-  },
-  textArea: {
-    borderRadius: 16,
-    padding: 16,
-    fontSize: 16,
-    minHeight: 120,
-    marginBottom: 16,
-    borderWidth: 1,
-    textAlignVertical: 'top',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 16,
-  },
-  imagePicker: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 12,
-    borderRadius: 16,
-    gap: 8,
+    padding: 20,
+    marginBottom: 20,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
+        shadowOpacity: 0.1,
         shadowRadius: 4,
       },
       android: {
         elevation: 4,
       },
     }),
+  },
+  textArea: {
+    minHeight: 120,
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 16,
+    textAlignVertical: 'top',
+    marginBottom: 16,
+    borderWidth: 1,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+    gap: 10,
+  },
+  imagePicker: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderRadius: 12,
+    flex: 1,
+    marginRight: 8,
   },
   imagePickerText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
+    marginLeft: 8,
+  },
+  postButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    flex: 1,
+  },
+  postButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+    marginLeft: 8,
+  },
+  postButtonDisabled: {
+    opacity: 0.6,
   },
   imagePreviewContainer: {
+    marginTop: 10,
+    alignItems: 'center',
     position: 'relative',
     marginBottom: 16,
-    borderRadius: 16,
-    overflow: 'hidden',
+  },
+  previewLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
   },
   previewImage: {
     width: '100%',
     height: 200,
-    borderRadius: 16,
+    borderRadius: 12,
   },
   removeImage: {
     position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
+    top: 0,
+    right: 0,
+    backgroundColor: 'red',
+    borderRadius: 15,
+    width: 30,
+    height: 30,
     justifyContent: 'center',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
+    alignItems: 'center',
+    zIndex: 1,
   },
   removeImageText: {
     color: '#fff',
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
-    lineHeight: 24,
-  },
-  postButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 12,
-    borderRadius: 16,
-    gap: 8,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
-  },
-  postButtonDisabled: {
-    opacity: 0.7,
-  },
-  postButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
   },
 });
 

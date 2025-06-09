@@ -45,7 +45,6 @@ const TotalPostScreen = () => {
   const handleNavigation = (screen) => {
     navigation.navigate(screen, {
       showBackButton: true,
-      onBackPress: () => navigation.navigate('TotalPost'),
     });
   };
 

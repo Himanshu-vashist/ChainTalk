@@ -19,23 +19,31 @@ export const ThemeProvider = ({ children }) => {
     isDarkMode,
     toggleTheme,
     colors: isDarkMode ? {
-      background: '#000000',
-      surface: 'rgba(255, 255, 255, 0.05)',
-      primary: 'rgb(255, 149, 0)',
-      text: '#FFFFFF',
-      textSecondary: 'rgba(255, 255, 255, 0.7)',
-      border: 'rgba(255, 255, 255, 0.1)',
-      buttonBackground: 'rgba(255, 255, 255, 0.1)',
-      buttonText: '#FFFFFF',
+      background: '#121212', // Deep, soft black
+      surface: '#1F1F1F', // Slightly lighter, muted grey for cards/elements
+      primary: '#007BFF', // Modern, clean blue
+      secondary: '#17A2B8', // Vibrant teal
+      text: '#E0E0E0', // Soft white
+      textSecondary: '#A0A0A0', // Lighter grey for secondary text
+      border: '#3A3A3A', // Subtle dark grey for borders
+      buttonBackground: '#007BFF', // Primary color for buttons
+      buttonText: '#FFFFFF', // White text on buttons
+      error: '#DC3545', // Standard red for errors
+      activeBackground: 'rgba(0, 123, 255, 0.2)', // Muted transparent blue for active navbar item
+      hoverBackground: 'rgba(0, 123, 255, 0.1)', // Subtle transparent blue for hover
     } : {
-      background: '#FFFFFF',
-      surface: 'rgba(0, 0, 0, 0.05)',
-      primary: 'rgb(255, 149, 0)',
-      text: '#000000',
-      textSecondary: 'rgba(0, 0, 0, 0.7)',
-      border: 'rgba(0, 0, 0, 0.1)',
-      buttonBackground: 'rgba(0, 0, 0, 0.05)',
-      buttonText: '#000000',
+      background: '#F8F9FA', // Very light grey background
+      surface: '#FFFFFF', // Pure white surface for cards/elements
+      primary: '#007BFF', // Modern, clean blue
+      secondary: '#17A2B8', // Vibrant teal
+      text: '#343A40', // Dark charcoal
+      textSecondary: '#6C757D', // Medium grey for secondary text
+      border: '#E9ECEF', // Light, subtle grey for borders
+      buttonBackground: '#007BFF', // Primary color for buttons
+      buttonText: '#FFFFFF', // White text on buttons
+      error: '#DC3545', // Standard red for errors
+      activeBackground: 'rgba(0, 123, 255, 0.1)', // Very light transparent blue for active navbar item
+      hoverBackground: 'rgba(0, 123, 255, 0.05)', // Even lighter transparent blue for hover
     }
   };
 

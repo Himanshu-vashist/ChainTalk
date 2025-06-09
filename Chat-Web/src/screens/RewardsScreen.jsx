@@ -82,7 +82,8 @@ const RewardsScreen = () => {
 
   const renderRewardItem = (item) => {
     const isEarned = item.type === 'earn';
-    const amountColor = isEarned ? '#4CAF50' : '#F44336';
+    const amountColor = isEarned ? colors.primary : colors.error;
+    const iconBackgroundColor = `rgba(${parseInt(amountColor.slice(1,3), 16)}, ${parseInt(amountColor.slice(3,5), 16)}, ${parseInt(amountColor.slice(5,7), 16)}, 0.15)`;
 
     return (
       <Animated.View
@@ -93,10 +94,12 @@ const RewardsScreen = () => {
             backgroundColor: colors.surface,
             opacity: fadeAnim,
             transform: [{ translateY }],
+            borderColor: colors.border,
+            borderWidth: 1,
           },
         ]}
       >
-        <View style={[styles.iconContainer, { backgroundColor: amountColor + '15' }]}>
+        <View style={[styles.iconContainer, { backgroundColor: iconBackgroundColor }]}>
           <MaterialIcons name={item.icon} size={24} color={amountColor} />
         </View>
         <View style={styles.rewardContent}>
@@ -123,6 +126,8 @@ const RewardsScreen = () => {
             backgroundColor: colors.surface,
             opacity: fadeAnim,
             transform: [{ translateY }],
+            borderColor: colors.border,
+            borderBottomWidth: 1,
           },
         ]}
       >
@@ -139,6 +144,8 @@ const RewardsScreen = () => {
             backgroundColor: colors.surface,
             opacity: fadeAnim,
             transform: [{ scale: scaleAnim }],
+            borderColor: colors.border,
+            borderWidth: 1,
           },
         ]}
       >
@@ -152,13 +159,13 @@ const RewardsScreen = () => {
         <View style={styles.balanceDetails}>
           <View style={styles.balanceDetail}>
             <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Available</Text>
-            <Text style={[styles.detailValue, { color: '#4CAF50' }]}>
+            <Text style={[styles.detailValue, { color: colors.primary }]}>
               {rewards.availableTokens}
             </Text>
           </View>
           <View style={styles.balanceDetail}>
             <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Locked</Text>
-            <Text style={[styles.detailValue, { color: '#FF9800' }]}>
+            <Text style={[styles.detailValue, { color: colors.secondary }]}>
               {rewards.lockedTokens}
             </Text>
           </View>
@@ -177,11 +184,18 @@ const RewardsScreen = () => {
       </View>
 
       <TouchableOpacity
-        style={[styles.redeemButton, { backgroundColor: colors.primary }]}
+        style={[
+          styles.redeemButton,
+          { 
+            backgroundColor: colors.primary,
+            borderColor: colors.primary,
+            borderWidth: 1,
+          }
+        ]}
         onPress={() => {/* Handle redeem */}}
       >
-        <MaterialIcons name="card-giftcard" size={24} color="#fff" />
-        <Text style={styles.redeemButtonText}>Redeem Rewards</Text>
+        <MaterialIcons name="card-giftcard" size={24} color={colors.buttonText} />
+        <Text style={[styles.redeemButtonText, { color: colors.buttonText }]}>Redeem Rewards</Text>
       </TouchableOpacity>
     </View>
   );
@@ -214,6 +228,7 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 16,
+    lineHeight: 22,
   },
   balanceCard: {
     margin: 16,
@@ -239,7 +254,7 @@ const styles = StyleSheet.create({
   },
   balanceTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   balanceAmount: {
     fontSize: 32,
@@ -248,10 +263,8 @@ const styles = StyleSheet.create({
   },
   balanceDetails: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.1)',
-    paddingTop: 16,
+    justifyContent: 'space-around',
+    width: '100%',
   },
   balanceDetail: {
     alignItems: 'center',
@@ -261,12 +274,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   detailValue: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   section: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 16,
+    marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 20,
@@ -277,13 +291,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   historyListContent: {
-    gap: 12,
+    paddingBottom: 20,
   },
   rewardItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
     borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -297,23 +312,24 @@ const styles = StyleSheet.create({
     }),
   },
   iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
-    marginRight: 12,
+    justifyContent: 'center',
+    marginRight: 16,
   },
   rewardContent: {
     flex: 1,
+    marginRight: 16,
   },
   rewardDescription: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: 'bold',
     marginBottom: 4,
   },
   rewardDate: {
-    fontSize: 12,
+    fontSize: 13,
   },
   rewardAmount: {
     fontSize: 18,
@@ -323,26 +339,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 16,
-    padding: 16,
+    paddingVertical: 16,
     borderRadius: 16,
-    gap: 8,
+    marginHorizontal: 16,
+    marginBottom: 20,
+    marginTop: 10,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
       },
       android: {
-        elevation: 5,
+        elevation: 8,
       },
     }),
   },
   redeemButtonText: {
-    color: '#fff',
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
+    marginLeft: 8,
   },
 });
 
