@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Animated,
   Platform,
+  StatusBar,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../Context/ThemeContext';
@@ -50,31 +51,44 @@ const FriendPostScreen = () => {
         },
       ]}
     >
+      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
       <View style={[styles.header, { backgroundColor: colors.surface }]}>
         <TouchableOpacity
-          style={[styles.backButton, { backgroundColor: colors.primary + '10' }]}
+          style={[styles.backButton, { backgroundColor: colors.primary + '15' }]}
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
           <MaterialIcons name="arrow-back-ios" size={20} color={colors.primary} />
         </TouchableOpacity>
         <View style={styles.headerContent}>
-          <MaterialIcons name="group" size={24} color={colors.primary} style={styles.headerIcon} />
+          <View style={[styles.headerIconContainer, { backgroundColor: colors.primary + '15' }]}>
+            <MaterialIcons name="group" size={24} color={colors.primary} />
+          </View>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Friend's Posts</Text>
         </View>
-        <View style={styles.backButton} />
+        <TouchableOpacity
+          style={[styles.refreshButton, { backgroundColor: colors.primary + '15' }]}
+          onPress={() => {/* Add refresh logic */}}
+          activeOpacity={0.7}
+        >
+          <MaterialIcons name="refresh" size={20} color={colors.primary} />
+        </TouchableOpacity>
       </View>
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <View style={[styles.loadingCircle, { borderColor: colors.primary }]}>
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
           <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
-            Loading posts...
+            Loading friend's posts...
           </Text>
         </View>
       ) : error ? (
         <View style={styles.errorContainer}>
-          <MaterialIcons name="error-outline" size={48} color={colors.error} />
+          <View style={[styles.errorIconContainer, { backgroundColor: colors.error + '15' }]}>
+            <MaterialIcons name="error-outline" size={48} color={colors.error} />
+          </View>
           <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
           <TouchableOpacity
             style={[styles.retryButton, { backgroundColor: colors.primary }]}
@@ -87,16 +101,28 @@ const FriendPostScreen = () => {
       ) : (
         <FlatList
           data={posts}
-          renderItem={({ item }) => <PostCard post={item} />}
+          renderItem={({ item, index }) => <PostCard post={item} index={index} />}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.postList}
+          contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={() => (
             <View style={styles.emptyContainer}>
-              <MaterialIcons name="post-add" size={48} color={colors.textSecondary} />
-              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-                No posts from friends yet
+              <View style={[styles.emptyIconContainer, { backgroundColor: colors.textSecondary + '15' }]}>
+                <MaterialIcons name="group" size={48} color={colors.textSecondary} />
+              </View>
+              <Text style={[styles.emptyTitle, { color: colors.text }]}>
+                No Posts Yet
               </Text>
+              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+                When your friends share posts, they'll appear here
+              </Text>
+              <TouchableOpacity
+                style={[styles.addFriendsButton, { backgroundColor: colors.primary }]}
+                onPress={() => navigation.navigate('AddFriends')}
+              >
+                <MaterialIcons name="person-add" size={20} color="#fff" />
+                <Text style={styles.addFriendsText}>Add Friends</Text>
+              </TouchableOpacity>
             </View>
           )}
         />
@@ -114,9 +140,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.1)',
+    borderBottomColor: 'rgba(0,0,0,0.08)',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -132,71 +158,125 @@ const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 20,
   },
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
   },
-  headerIcon: {
-    marginRight: 4,
+  headerIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  refreshButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
+    gap: 16,
+  },
+  loadingCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   loadingText: {
     fontSize: 16,
-    marginTop: 8,
+    fontWeight: '500',
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 16,
-    padding: 20,
+    gap: 20,
+    padding: 24,
+  },
+  errorIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   errorText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
     textAlign: 'center',
   },
   retryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
     gap: 8,
     marginTop: 8,
   },
   retryText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
   },
-  postList: {
-    padding: 16,
+  listContent: {
+    paddingVertical: 16,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-    gap: 12,
+    padding: 24,
+    gap: 16,
+  },
+  emptyIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 4,
   },
   emptyText: {
     fontSize: 16,
     textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 16,
+  },
+  addFriendsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 25,
+    gap: 8,
+  },
+  addFriendsText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 
