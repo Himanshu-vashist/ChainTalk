@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Image,
   Alert,
+  StatusBar,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { chatAppContext } from '../Context/ChatAppContext';
@@ -134,15 +135,24 @@ const CreateNFTScreen = () => {
     }
   };
 
+  const handlePriceChange = (text) => {
+    // Only allow numbers and a single decimal point
+    const regex = /^\d*\.?\d*$/;
+    if (text === '' || regex.test(text)) {
+      setPrice(text);
+    }
+  };
+
   const handleCreate = async () => {
     if (!title || !description || !price || !originalImage || !previewImage) {
       Alert.alert('Validation', 'Please fill in all fields and select both images');
       return;
     }
 
-    // Validate price is a number
-    if (isNaN(price) || price <= 0) {
-      Alert.alert('Validation', 'Please enter a valid positive price');
+    // Validate price is a valid number
+    const priceNum = parseFloat(price);
+    if (isNaN(priceNum) || priceNum <= 0) {
+      Alert.alert('Validation', 'Please enter a valid positive price in ETH');
       return;
     }
 
@@ -161,8 +171,8 @@ const CreateNFTScreen = () => {
         setPreviewHash(finalPreviewHash);
       }
 
-      const priceInWei = parseEther(price.toString());
-      await createNFT(title, description, priceInWei, finalOriginalHash, finalPreviewHash);
+      const priceInWei = parseEther(priceNum.toString());
+      await createNFT(title, priceInWei, description, finalOriginalHash, finalPreviewHash);
       navigation.goBack();
       Alert.alert('Success', 'NFT created successfully.');
     } catch (err) {
@@ -177,6 +187,7 @@ const CreateNFTScreen = () => {
       style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
       <Animated.View
         style={[
           styles.header,
@@ -187,11 +198,20 @@ const CreateNFTScreen = () => {
           },
         ]}
       >
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <MaterialIcons name="arrow-back" size={24} color={colors.text} />
+        <TouchableOpacity 
+          style={[styles.backButton, { backgroundColor: colors.primary + '15' }]} 
+          onPress={() => navigation.goBack()}
+          activeOpacity={0.7}
+        >
+          <MaterialIcons name="arrow-back-ios" size={20} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Create NFT</Text>
-        <View style={styles.headerRight} />
+        <View style={styles.headerContent}>
+          <View style={[styles.headerIconContainer, { backgroundColor: colors.primary + '15' }]}>
+            <MaterialIcons name="add-photo-alternate" size={24} color={colors.primary} />
+          </View>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Create NFT</Text>
+        </View>
+        <View style={styles.backButton} />
       </Animated.View>
 
       <ScrollView
@@ -208,6 +228,46 @@ const CreateNFTScreen = () => {
             },
           ]}
         >
+          <View style={styles.imageSection}>
+            <View style={styles.imageContainer}>
+              <TouchableOpacity
+                style={[styles.imageUploadButton, { backgroundColor: colors.primary + '15' }]}
+                onPress={() => pickImage('original')}
+                activeOpacity={0.7}
+              >
+                {originalImage ? (
+                  <Image source={{ uri: originalImage.uri }} style={styles.previewImage} />
+                ) : (
+                  <View style={styles.uploadPlaceholder}>
+                    <MaterialIcons name="add-photo-alternate" size={32} color={colors.primary} />
+                    <Text style={[styles.uploadText, { color: colors.textSecondary }]}>
+                      Upload Original Image
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.imageContainer}>
+              <TouchableOpacity
+                style={[styles.imageUploadButton, { backgroundColor: colors.primary + '15' }]}
+                onPress={() => pickImage('preview')}
+                activeOpacity={0.7}
+              >
+                {previewImage ? (
+                  <Image source={{ uri: previewImage.uri }} style={styles.previewImage} />
+                ) : (
+                  <View style={styles.uploadPlaceholder}>
+                    <MaterialIcons name="add-photo-alternate" size={32} color={colors.primary} />
+                    <Text style={[styles.uploadText, { color: colors.textSecondary }]}>
+                      Upload Preview Image
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+
           <View style={styles.inputContainer}>
             <Text style={[styles.label, { color: colors.text }]}>Title</Text>
             <TextInput
@@ -248,103 +308,31 @@ const CreateNFTScreen = () => {
 
           <View style={styles.inputContainer}>
             <Text style={[styles.label, { color: colors.text }]}>Price (ETH)</Text>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: colors.surface,
-                  color: colors.text,
-                  borderColor: colors.border,
-                },
-              ]}
-              value={price}
-              onChangeText={setPrice}
-              placeholder="Enter price in ETH"
-              placeholderTextColor={colors.textSecondary}
-              keyboardType="numeric"
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Original Image</Text>
-            <TouchableOpacity
-              style={[styles.fileButton, { backgroundColor: colors.primary + '20' }]}
-              onPress={() => pickImage('original')}
-            >
-              <Text style={[styles.fileButtonText, { color: colors.primary }]}>
-                {originalImage ? 'Change Original Image' : 'Select Original Image'}
-              </Text>
-            </TouchableOpacity>
-            {originalImage && (
-              <View style={styles.imagePreviewContainer}>
-                <Image
-                  source={{ uri: originalImage.uri }}
-                  style={styles.previewImage}
-                  resizeMode="cover"
-                />
-                <TouchableOpacity
-                  style={[styles.removeImage, { backgroundColor: colors.error }]}
-                  onPress={() => setOriginalImage(null)}
-                >
-                  <Text style={styles.removeImageText}>×</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-            {originalHash && (
-              <Text style={[styles.hashText, { color: colors.textSecondary }]}>
-                IPFS Hash: {originalHash.substring(0, 10)}...{originalHash.substring(originalHash.length - 5)}
-              </Text>
-            )}
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Preview Image</Text>
-            <TouchableOpacity
-              style={[styles.fileButton, { backgroundColor: colors.primary + '20' }]}
-              onPress={() => pickImage('preview')}
-            >
-              <Text style={[styles.fileButtonText, { color: colors.primary }]}>
-                {previewImage ? 'Change Preview Image' : 'Select Preview Image'}
-              </Text>
-            </TouchableOpacity>
-            {previewImage && (
-              <View style={styles.imagePreviewContainer}>
-                <Image
-                  source={{ uri: previewImage.uri }}
-                  style={styles.previewImage}
-                  resizeMode="cover"
-                />
-                <TouchableOpacity
-                  style={[styles.removeImage, { backgroundColor: colors.error }]}
-                  onPress={() => setPreviewImage(null)}
-                >
-                  <Text style={styles.removeImageText}>×</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-            {previewHash && (
-              <Text style={[styles.hashText, { color: colors.textSecondary }]}>
-                IPFS Hash: {previewHash.substring(0, 10)}...{previewHash.substring(previewHash.length - 5)}
-              </Text>
-            )}
-          </View>
-
-          {(error || uploadError) && (
-            <View style={[styles.errorContainer, { backgroundColor: colors.error + '10' }]}>
-              <MaterialIcons name="error-outline" size={20} color={colors.error} />
-              <Text style={[styles.errorText, { color: colors.error }]}>
-                {error || uploadError}
-              </Text>
+            <View style={[styles.priceInputContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <TextInput
+                style={[styles.priceInput, { color: colors.text }]}
+                value={price}
+                onChangeText={handlePriceChange}
+                placeholder="0.00"
+                placeholderTextColor={colors.textSecondary}
+                keyboardType="decimal-pad"
+              />
+              <Text style={[styles.ethLabel, { color: colors.primary }]}>ETH</Text>
             </View>
-          )}
+          </View>
+
+          {uploadError ? (
+            <Text style={[styles.errorText, { color: colors.error }]}>{uploadError}</Text>
+          ) : null}
 
           <TouchableOpacity
             style={[styles.createButton, { backgroundColor: colors.primary }]}
             onPress={handleCreate}
             disabled={loading || uploading}
+            activeOpacity={0.7}
           >
             {loading || uploading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color="#fff" size="small" />
             ) : (
               <>
                 <MaterialIcons name="add-circle" size={20} color="#fff" />
@@ -367,7 +355,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.08)',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -381,14 +371,27 @@ const styles = StyleSheet.create({
     }),
   },
   backButton: {
-    padding: 8,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  headerIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: '600',
-  },
-  headerRight: {
-    width: 40,
+    fontWeight: '700',
   },
   scrollView: {
     flex: 1,
@@ -397,54 +400,87 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   formContainer: {
-    gap: 16,
+    gap: 20,
+  },
+  imageSection: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 8,
+    paddingHorizontal: 4,
+  },
+  imageContainer: {
+    flex: 1,
+    maxWidth: '48%',
+  },
+  imageUploadButton: {
+    aspectRatio: 1,
+    borderRadius: 12,
+    overflow: 'hidden',
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: 'rgba(0,0,0,0.1)',
+    maxHeight: 120,
+  },
+  previewImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  uploadPlaceholder: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    padding: 8,
+  },
+  uploadText: {
+    fontSize: 11,
+    textAlign: 'center',
+    paddingHorizontal: 4,
   },
   inputContainer: {
     gap: 8,
   },
   label: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   input: {
     height: 48,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: 1,
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     fontSize: 16,
   },
   textArea: {
-    height: 120,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: 1,
-    paddingHorizontal: 12,
-    paddingTop: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     fontSize: 16,
     textAlignVertical: 'top',
   },
-  fileButton: {
-    height: 48,
-    borderRadius: 8,
-    justifyContent: 'center',
-    paddingHorizontal: 12,
-  },
-  fileButtonText: {
-    fontSize: 16,
-  },
-  hashText: {
-    fontSize: 12,
-    marginTop: 4,
-  },
-  errorContainer: {
+  priceInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    borderRadius: 8,
-    gap: 8,
+    height: 48,
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 16,
+  },
+  priceInput: {
+    flex: 1,
+    fontSize: 16,
+  },
+  ethLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
   },
   errorText: {
     fontSize: 14,
-    flex: 1,
+    textAlign: 'center',
+    marginTop: 8,
   },
   createButton: {
     flexDirection: 'row',
@@ -453,39 +489,13 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 24,
     gap: 8,
+    marginTop: 8,
   },
   createButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },
-  imagePreviewContainer: {
-    marginTop: 10,
-    alignItems: 'center',
-    position: 'relative',
-    marginBottom: 16,
-  },
-  previewImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 6,
-  },
-  removeImage: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    borderRadius: 15,
-    width: 30,
-    height: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1,
-  },
-  removeImageText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  }
 });
 
 export default CreateNFTScreen;

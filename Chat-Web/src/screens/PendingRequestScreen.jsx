@@ -10,17 +10,38 @@ import {
   FlatList,
   Platform,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { chatAppContext } from '../Context/ChatAppContext';
 import { useTheme } from '../Context/ThemeContext';
+import { MaterialIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = (SCREEN_WIDTH - 48) / 2; // 2 cards per row with padding
+const CARD_MAX_WIDTH = 340;
+const CARD_WIDTH = Math.min((SCREEN_WIDTH - 48) / 2, CARD_MAX_WIDTH); // 2 cards per row with padding, max 340px
+
+const DefaultAvatar = ({ size = 40, color = '#888' }) => (
+  <View style={{
+    width: size,
+    height: size,
+    borderRadius: size / 2,
+    backgroundColor: '#222',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: color,
+  }}>
+    <MaterialIcons name="person" size={size * 0.6} color={color} />
+  </View>
+);
 
 const PendingRequestCard = ({ user, imageUrl, index, acceptFriendRequest, rejectRequest, colors }) => {
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const [isPressed, setIsPressed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
     Animated.parallel([
@@ -40,25 +61,27 @@ const PendingRequestCard = ({ user, imageUrl, index, acceptFriendRequest, reject
     ]).start();
   }, []);
 
-  const handlePressIn = () => {
-    setIsPressed(true);
-    Animated.spring(scaleAnim, {
-      toValue: 0.98,
-      tension: 50,
-      friction: 7,
-      useNativeDriver: true,
-    }).start();
+  const handleAccept = async () => {
+    setIsLoading(true);
+    try {
+      await acceptFriendRequest(user.accountAddress);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handlePressOut = () => {
-    setIsPressed(false);
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      tension: 50,
-      friction: 7,
-      useNativeDriver: true,
-    }).start();
+  const handleReject = async () => {
+    setIsLoading(true);
+    try {
+      await rejectRequest(user.accountAddress);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  // Status indicator: online (green), offline (gray)
+  const isOnline = true; // You can replace this with real status if available
+  const statusColor = isOnline ? '#4ade80' : '#a1a1aa';
 
   return (
     <Animated.View
@@ -68,63 +91,69 @@ const PendingRequestCard = ({ user, imageUrl, index, acceptFriendRequest, reject
           transform: [{ scale: scaleAnim }],
           opacity: opacityAnim,
           width: CARD_WIDTH,
+          maxWidth: CARD_MAX_WIDTH,
+          alignSelf: 'center',
         },
       ]}
     >
-      <View 
-        style={[
-          styles.requestCard, 
-          { 
-            backgroundColor: colors.surface,
-            transform: [{ scale: isPressed ? 0.98 : 1 }],
-          }
-        ]}
+      <LinearGradient
+        colors={[colors.surface, '#23272fBB']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.glassCardBgCompact}
       >
-        <View style={[styles.cardGradient, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.1)` }]} />
-        <View style={styles.userInfo}>
-          <View style={styles.imageContainer}>
-            <Image 
-              source={{ uri: imageUrl }} 
-              style={[styles.userImage, { borderColor: colors.surface }]}
-            />
-            <View style={[styles.statusIndicator, { backgroundColor: colors.primary, borderColor: colors.surface }]} />
+        <View style={styles.userInfoCompact}>
+          <View style={styles.imageContainerCompact}>
+            <LinearGradient
+              colors={[colors.primary, '#4f8cff', '#23272f']}
+              style={styles.avatarGradientCompact}
+            >
+              {imgError || !imageUrl ? (
+                <DefaultAvatar size={40} color={colors.primary} />
+              ) : (
+                <Image
+                  source={{ uri: imageUrl }}
+                  style={styles.userImageCompact}
+                  onError={() => setImgError(true)}
+                />
+              )}
+            </LinearGradient>
+            <View style={[styles.statusIndicatorCompact, { backgroundColor: statusColor, borderColor: colors.surface }]} />
           </View>
-          <View style={styles.userDetails}>
-            <Text style={[styles.userName, { color: colors.primary }]} numberOfLines={1}>{user?.name || 'Unknown User'}</Text>
-            <Text style={[styles.userAddress, { color: colors.textSecondary }]} numberOfLines={1}>
+          <View style={styles.userDetailsCompact}>
+            <Text style={[styles.userNameCompact, { color: colors.primary }]} numberOfLines={1}>{user?.name || 'Unknown'}</Text>
+            <Text style={[styles.userAddressCompact, { color: colors.textSecondary }]} numberOfLines={1}>
               {user?.accountAddress.slice(0, 4)}...{user?.accountAddress.slice(-4)}
             </Text>
           </View>
         </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={[
-              styles.actionButton, 
-              styles.acceptButton,
-              { backgroundColor: colors.primary }
-            ]}
-            onPress={() => acceptFriendRequest(user.accountAddress)}
-            onPressIn={handlePressIn}
-            onPressOut={handlePressOut}
-            activeOpacity={0.8}
+        <View style={styles.buttonContainerCompact}>
+          <TouchableOpacity
+            style={[styles.iconButton, { backgroundColor: colors.primary }]}
+            onPress={handleAccept}
+            activeOpacity={0.7}
+            disabled={isLoading}
           >
-            <Text style={[styles.buttonText, { color: colors.buttonText }]}>Accept</Text>
+            {isLoading ? (
+              <ActivityIndicator size="small" color={colors.buttonText} />
+            ) : (
+              <MaterialIcons name="check" size={20} color={colors.buttonText} />
+            )}
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={[
-              styles.actionButton, 
-              styles.rejectButton,
-              { backgroundColor: colors.error }
-            ]}
-            onPress={() => rejectRequest(user.accountAddress)}
-            onPressIn={handlePressIn}
-            onPressOut={handlePressOut}
-            activeOpacity={0.8}
+          <TouchableOpacity
+            style={[styles.iconButton, { backgroundColor: colors.error }]}
+            onPress={handleReject}
+            activeOpacity={0.7}
+            disabled={isLoading}
           >
-            <Text style={[styles.buttonText, { color: colors.buttonText }]}>Reject</Text>
+            {isLoading ? (
+              <ActivityIndicator size="small" color={colors.buttonText} />
+            ) : (
+              <MaterialIcons name="close" size={20} color={colors.buttonText} />
+            )}
           </TouchableOpacity>
         </View>
-      </View>
+      </LinearGradient>
     </Animated.View>
   );
 };
@@ -135,6 +164,7 @@ const PendingRequestScreen = () => {
   const [userImages, setUserImages] = useState({});
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(-10)).current;
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const getUserDetails = (address) => {
     return userList.find(
@@ -188,6 +218,16 @@ const PendingRequestScreen = () => {
     if (pendingRequests.length > 0) fetchImages();
   }, [pendingRequests, userList]);
 
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      // Add your refresh logic here
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulated delay
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   return (
     <Animated.View
       style={[
@@ -200,8 +240,9 @@ const PendingRequestScreen = () => {
       ]}
     >
       <View style={styles.mainContent}>
-        <View style={[styles.headerSection, { backgroundColor: colors.surface }]}>
+        <View style={[styles.headerSection, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]}>
           <View style={[styles.headerGradient, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.2)` }]} />
+          <MaterialIcons name="people" size={32} color={colors.primary} style={styles.headerIcon} />
           <Text style={[styles.heading, { color: colors.text }]}>
             Pending Requests
           </Text>
@@ -212,6 +253,7 @@ const PendingRequestScreen = () => {
 
         {pendingRequests.length === 0 ? (
           <View style={[styles.emptyContainer, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]}>
+            <MaterialIcons name="people-outline" size={48} color={colors.textSecondary} style={styles.emptyIcon} />
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
               No pending requests at the moment.
             </Text>
@@ -238,6 +280,8 @@ const PendingRequestScreen = () => {
             numColumns={2}
             contentContainerStyle={styles.listContent}
             columnWrapperStyle={styles.columnWrapper}
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
           />
         )}
       </View>
@@ -279,6 +323,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     opacity: 0.5,
   },
+  headerIcon: {
+    marginBottom: 12,
+  },
   heading: {
     fontSize: 28,
     fontWeight: 'bold',
@@ -300,92 +347,88 @@ const styles = StyleSheet.create({
   requestCardContainer: {
     marginBottom: 16,
   },
-  requestCard: {
+  glassCardBgCompact: {
     borderRadius: 16,
     padding: 12,
-    overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
+    marginBottom: 0,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(36, 40, 47, 0.7)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.10,
+    shadowRadius: 8,
+    elevation: 4,
+    minHeight: 110,
+    justifyContent: 'center',
   },
-  cardGradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    opacity: 0.5,
-  },
-  userInfo: {
+  userInfoCompact: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
-  },
-  imageContainer: {
-    position: 'relative',
     marginBottom: 8,
+    gap: 10,
   },
-  userImage: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    borderWidth: 2,
+  imageContainerCompact: {
+    position: 'relative',
+    marginRight: 8,
   },
-  statusIndicator: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    borderWidth: 2,
-  },
-  userDetails: {
+  avatarGradientCompact: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
-    width: '100%',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(0,0,0,0.1)',
   },
-  userName: {
-    fontSize: 14,
+  userImageCompact: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: '#181a20',
+  },
+  statusIndicatorCompact: {
+    position: 'absolute',
+    bottom: 2,
+    right: 2,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 2,
+  },
+  userDetailsCompact: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  userNameCompact: {
+    fontSize: 15,
     fontWeight: '600',
     marginBottom: 2,
-    textAlign: 'center',
   },
-  userAddress: {
+  userAddressCompact: {
     fontSize: 12,
-    textAlign: 'center',
+    color: '#aaa',
   },
-  buttonContainer: {
+  buttonContainerCompact: {
     flexDirection: 'row',
-    gap: 8,
-  },
-  actionButton: {
-    flex: 1,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 12,
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
+    gap: 10,
+    marginTop: 2,
   },
-  buttonText: {
-    fontSize: 12,
-    fontWeight: '600',
+  iconButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 2,
   },
   emptyContainer: {
     borderRadius: 24,
@@ -403,6 +446,9 @@ const styles = StyleSheet.create({
         elevation: 8,
       },
     }),
+  },
+  emptyIcon: {
+    marginBottom: 16,
   },
   emptyText: {
     fontSize: 16,

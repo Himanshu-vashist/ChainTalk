@@ -16,7 +16,7 @@ import { useTheme } from '../Context/ThemeContext';
 import { MaterialIcons } from '@expo/vector-icons';
 
 const MyNFTScreen = () => {
-  const { account, username, error, getMyNFTs, myNFTs, loading } = useContext(chatAppContext);
+  const { account, username, error, fetchMyNFTs, myNFTs, loading } = useContext(chatAppContext);
   const { colors } = useTheme();
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
@@ -49,15 +49,24 @@ const MyNFTScreen = () => {
 
   useEffect(() => {
     if (account) {
+      console.log('Account found, fetching NFTs...');
       fetchNFTs();
+    } else {
+      console.log('No account found');
     }
   }, [account]);
 
+  useEffect(() => {
+    console.log('myNFTs updated:', myNFTs);
+  }, [myNFTs]);
+
   const fetchNFTs = async () => {
     try {
-      await getMyNFTs();
+      await fetchMyNFTs();
+      console.log('My NFTs after fetch:', myNFTs);
       setLocalError(null);
     } catch (err) {
+      console.error('Error fetching NFTs:', err);
       setLocalError(err.message || 'Failed to fetch NFTs');
     }
   };

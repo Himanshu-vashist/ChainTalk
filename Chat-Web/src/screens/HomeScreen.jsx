@@ -250,7 +250,7 @@ const FeatureCard = ({ image, title, description, colors, icon }) => (
       }
     ]}
   >
-    <View style={[styles.featureIconContainer, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.15)` }]}>
+    <View style={[styles.featureIconContainer, { backgroundColor: colors.primary + '15' }]}>
       <Text style={styles.featureIcon}>{icon}</Text>
     </View>
     <Text style={[styles.featureTitle, { color: colors.text }]}>{title}</Text>
@@ -259,9 +259,9 @@ const FeatureCard = ({ image, title, description, colors, icon }) => (
 );
 
 const StatItem = ({ icon, value, label, colors }) => (
-  <View style={styles.statItem}>
-    <View style={[styles.statIconContainer, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.2)` }]}>
-      <MaterialIcons name={icon} size={28} color={colors.primary} />
+  <View style={[styles.statItem, { backgroundColor: colors.surface }]}>
+    <View style={[styles.statIconContainer, { backgroundColor: colors.primary + '15' }]}>
+      <MaterialIcons name={icon} size={24} color={colors.primary} />
     </View>
     <Text style={[styles.statValue, { color: colors.primary }]}>{value}</Text>
     <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{label}</Text>
@@ -269,11 +269,11 @@ const StatItem = ({ icon, value, label, colors }) => (
 );
 
 const BenefitItem = ({ icon, title, description, colors }) => (
-  <View style={styles.benefitItem}>
-    <View style={[styles.benefitIconContainer, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.2)` }]}>
+  <View style={[styles.benefitItem, { backgroundColor: colors.surface }]}>
+    <View style={[styles.benefitIconContainer, { backgroundColor: colors.primary + '15' }]}>
       <Text style={[styles.benefitIcon, { color: colors.primary }]}>{icon}</Text>
     </View>
-    <Text style={[styles.benefitTitle, { color: colors.primary }]}>{title}</Text>
+    <Text style={[styles.benefitTitle, { color: colors.text }]}>{title}</Text>
     <Text style={[styles.benefitDescription, { color: colors.textSecondary }]}>{description}</Text>
   </View>
 );
@@ -398,69 +398,54 @@ const styles = StyleSheet.create({
     maxWidth: 200,
   },
   featuresSection: {
-    padding: 16,
     gap: 16,
-    marginBottom: 16,
+    marginBottom: 24,
   },
   featureCard: {
     borderRadius: 16,
-    overflow: 'hidden',
+    padding: 20,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowRadius: 8,
       },
       android: {
         elevation: 4,
       },
     }),
   },
-  featureImageContainer: {
-    position: 'relative',
-  },
-  featureImage: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-  },
-  iconOverlay: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
+  featureIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
   },
-  iconText: {
-    fontSize: 20,
-  },
-  featureContent: {
-    padding: 16,
+  featureIcon: {
+    fontSize: 24,
   },
   featureTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
     marginBottom: 8,
   },
-  featureDesc: {
+  featureDescription: {
     fontSize: 14,
     lineHeight: 20,
   },
   statsSection: {
     padding: 24,
-    marginBottom: 16,
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
+    marginBottom: 24,
+    borderRadius: 24,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: -2 },
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowRadius: 8,
       },
       android: {
         elevation: 4,
@@ -476,7 +461,7 @@ const styles = StyleSheet.create({
   },
   statItem: {
     width: (screenWidth - 80) / 2,
-    padding: 16,
+    padding: 20,
     borderRadius: 16,
     alignItems: 'center',
     ...Platform.select({
@@ -487,27 +472,47 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
       },
       android: {
-        elevation: 4,
+        elevation: 2,
       },
     }),
   },
+  statIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
   statValue: {
     fontSize: 24,
-    fontWeight: 'bold',
-    marginVertical: 4,
+    fontWeight: '700',
+    marginBottom: 4,
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 13,
     textAlign: 'center',
   },
   benefitsSection: {
     padding: 24,
-    marginBottom: 16,
+    marginBottom: 24,
+    borderRadius: 24,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   sectionTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
+    fontWeight: '700',
+    marginBottom: 20,
   },
   benefitsGrid: {
     flexDirection: 'row',
@@ -517,7 +522,7 @@ const styles = StyleSheet.create({
   },
   benefitItem: {
     width: (screenWidth - 80) / 2,
-    padding: 16,
+    padding: 20,
     borderRadius: 16,
     alignItems: 'center',
     ...Platform.select({
@@ -528,7 +533,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
       },
       android: {
-        elevation: 4,
+        elevation: 2,
       },
     }),
   },
@@ -536,9 +541,9 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    justifyContent: 'center',
+    marginBottom: 12,
   },
   benefitIcon: {
     fontSize: 24,
@@ -546,16 +551,30 @@ const styles = StyleSheet.create({
   benefitTitle: {
     fontSize: 16,
     fontWeight: '600',
-    marginBottom: 4,
-  },
-  benefitDesc: {
-    fontSize: 12,
+    marginBottom: 8,
     textAlign: 'center',
+  },
+  benefitDescription: {
+    fontSize: 13,
+    textAlign: 'center',
+    lineHeight: 18,
   },
   footer: {
     padding: 24,
     alignItems: 'center',
     marginBottom: Platform.OS === 'ios' ? 40 : 24,
+    borderRadius: 24,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   footerText: {
     fontSize: 14,

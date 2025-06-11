@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   TextInput,
   Platform,
+  StatusBar,
 } from 'react-native';
 import { chatAppContext } from '../Context/ChatAppContext';
 import { useTheme } from '../Context/ThemeContext';
@@ -48,7 +49,7 @@ class ErrorBoundary extends Component {
   }
 }
 
-const PostCard = ({ post, index }) => {
+export const PostCard = ({ post, index }) => {
   const { colors } = useTheme();
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
@@ -124,25 +125,25 @@ const PostCard = ({ post, index }) => {
           },
         ]}
       >
-        <View style={[styles.cardGradient, { backgroundColor: colors.primary + '10' }]} />
+        <View style={[styles.cardGradient, { backgroundColor: colors.primary + '08' }]} />
 
         <View style={styles.postHeader}>
           <View style={styles.userInfo}>
-            <View style={[styles.avatarContainer, { backgroundColor: colors.primary + '20' }]}>
-              <MaterialIcons name="person" size={24} color={colors.primary} />
+            <View style={[styles.avatarContainer, { backgroundColor: colors.primary + '15' }]}>
+              <MaterialIcons name="person" size={20} color={colors.primary} />
             </View>
             <View style={styles.userDetails}>
-              <Text style={[styles.userName, { color: colors.text }]}>
+              <Text style={[styles.userName, { color: colors.text }]} numberOfLines={1}>
                 {post.owner.slice(0, 6)}...{post.owner.slice(-4)}
               </Text>
-              <Text style={[styles.postDate, { color: colors.textSecondary }]}>
+              <Text style={[styles.postDate, { color: colors.textSecondary }]} numberOfLines={1}>
                 {formatDate(post.timestamp)}
               </Text>
             </View>
           </View>
         </View>
 
-        <Text style={[styles.postContent, { color: colors.text }]}>
+        <Text style={[styles.postContent, { color: colors.text }]} numberOfLines={3}>
           {post.content}
         </Text>
 
@@ -159,18 +160,22 @@ const PostCard = ({ post, index }) => {
 
         <View style={styles.postFooter}>
           <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <MaterialIcons name="favorite" size={20} color={colors.primary} />
+            <TouchableOpacity style={styles.statItem}>
+              <View style={[styles.statIconContainer, { backgroundColor: colors.primary + '15' }]}>
+                <MaterialIcons name="favorite" size={18} color={colors.primary} />
+              </View>
               <Text style={[styles.statText, { color: colors.textSecondary }]}>
                 {(post.likes || []).length}
               </Text>
-            </View>
-            <View style={styles.statItem}>
-              <MaterialIcons name="chat-bubble-outline" size={20} color={colors.primary} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.statItem}>
+              <View style={[styles.statIconContainer, { backgroundColor: colors.primary + '15' }]}>
+                <MaterialIcons name="chat-bubble-outline" size={18} color={colors.primary} />
+              </View>
               <Text style={[styles.statText, { color: colors.textSecondary }]}>
                 {(post.comments || []).length}
               </Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
       </Animated.View>
@@ -215,25 +220,62 @@ const AllPostScreen = () => {
   }, []);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <Animated.View 
+      style={[
+        styles.container, 
+        { 
+          backgroundColor: colors.background,
+          opacity: fadeAnim,
+          transform: [{ translateY }],
+        }
+      ]}
+    >
+      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
       <View style={[styles.header, { backgroundColor: colors.surface }]}>
         <TouchableOpacity
-          style={styles.backButton}
+          style={[styles.backButton, { backgroundColor: colors.primary + '15' }]}
           onPress={() => navigation.navigate('TotalPost')}
+          activeOpacity={0.7}
         >
-          <MaterialIcons name="arrow-back" size={24} color={colors.text} />
+          <MaterialIcons name="arrow-back-ios" size={20} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Your Posts</Text>
-        <View style={styles.backButton} />
+        <View style={styles.headerContent}>
+          <View style={[styles.headerIconContainer, { backgroundColor: colors.primary + '15' }]}>
+            <MaterialIcons name="article" size={24} color={colors.primary} />
+          </View>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Your Posts</Text>
+        </View>
+        <TouchableOpacity
+          style={[styles.refreshButton, { backgroundColor: colors.primary + '15' }]}
+          onPress={() => fetchMyPosts()}
+          activeOpacity={0.7}
+        >
+          <MaterialIcons name="refresh" size={20} color={colors.primary} />
+        </TouchableOpacity>
       </View>
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <View style={[styles.loadingCircle, { borderColor: colors.primary }]}>
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+          <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
+            Loading your posts...
+          </Text>
         </View>
       ) : error ? (
         <View style={styles.errorContainer}>
+          <View style={[styles.errorIconContainer, { backgroundColor: colors.error + '15' }]}>
+            <MaterialIcons name="error-outline" size={48} color={colors.error} />
+          </View>
           <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
+          <TouchableOpacity
+            style={[styles.retryButton, { backgroundColor: colors.primary }]}
+            onPress={() => fetchMyPosts()}
+          >
+            <MaterialIcons name="refresh" size={20} color="#fff" />
+            <Text style={styles.retryText}>Retry</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -242,9 +284,29 @@ const AllPostScreen = () => {
           renderItem={({ item, index }) => <PostCard post={item} index={index} />}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          ListEmptyComponent={() => (
+            <View style={styles.emptyContainer}>
+              <View style={[styles.emptyIconContainer, { backgroundColor: colors.textSecondary + '15' }]}>
+                <MaterialIcons name="post-add" size={48} color={colors.textSecondary} />
+              </View>
+              <Text style={[styles.emptyTitle, { color: colors.text }]}>
+                No Posts Yet
+              </Text>
+              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+                Create your first post to get started
+              </Text>
+              <TouchableOpacity
+                style={[styles.createPostButton, { backgroundColor: colors.primary }]}
+                onPress={() => navigation.navigate('CreatePost')}
+              >
+                <MaterialIcons name="add" size={20} color="#fff" />
+                <Text style={styles.createPostText}>Create Post</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         />
       )}
-    </View>
+    </Animated.View>
   );
 };
 
@@ -440,63 +502,159 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.1)',
+    borderBottomColor: 'rgba(0,0,0,0.08)',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   backButton: {
     width: 40,
     height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  headerIconContainer: {
+    width: 40,
+    height: 40,
     borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  refreshButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    gap: 16,
+  },
+  loadingCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    fontWeight: '500',
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    gap: 20,
+    padding: 24,
+  },
+  errorIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   errorText: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   retryButton: {
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: '#007AFF',
-    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
+    gap: 8,
+    marginTop: 8,
   },
-  retryButtonText: {
+  retryText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
   },
   listContent: {
     paddingVertical: 16,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
     gap: 16,
   },
+  emptyIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  emptyText: {
+    fontSize: 16,
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 16,
+  },
+  createPostButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 25,
+    gap: 8,
+  },
+  createPostText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   postCard: {
-    borderRadius: 24,
-    padding: 16,
+    width: '48%', // Slightly less than 50% to account for gap
+    marginHorizontal: '1%',
+    marginVertical: 8,
+    borderRadius: 16,
     overflow: 'hidden',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
         shadowRadius: 8,
       },
       android: {
-        elevation: 8,
+        elevation: 4,
       },
     }),
   },
@@ -505,70 +663,79 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
-    opacity: 0.5,
+    height: 4,
   },
   postHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    justifyContent: 'space-between',
+    padding: 12,
   },
   userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
+    flex: 1,
   },
   avatarContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
-    marginRight: 12,
+    justifyContent: 'center',
   },
   userDetails: {
     flex: 1,
+    gap: 2,
   },
   userName: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
-    marginBottom: 2,
   },
   postDate: {
     fontSize: 12,
   },
   postContent: {
-    fontSize: 16,
-    lineHeight: 24,
-    marginBottom: 16,
+    fontSize: 14,
+    lineHeight: 20,
+    paddingHorizontal: 12,
+    paddingBottom: 12,
   },
   imageContainer: {
-    borderRadius: 16,
+    marginHorizontal: 12,
+    marginBottom: 12,
+    borderRadius: 12,
     overflow: 'hidden',
-    marginBottom: 16,
   },
   postImage: {
     width: '100%',
-    height: 200,
-    borderRadius: 16,
+    height: 150,
+    borderRadius: 12,
   },
   postFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
+    padding: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.08)',
   },
   statsContainer: {
     flexDirection: 'row',
-    gap: 16,
+    alignItems: 'center',
+    gap: 12,
   },
   statItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
+  },
+  statIconContainer: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   statText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '500',
   },
   actionContainer: {

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { chatAppContext } from "../Context/ChatAppContext";
+import { FaRegThumbsUp, FaRegCommentDots, FaUserCircle } from 'react-icons/fa';
+import { formatDistanceToNow } from 'date-fns';
 
 const PostScreen = ({ post }) => {
     const { currentUserAddress, likePost, commentOnPost } = useContext(chatAppContext);
@@ -60,93 +62,61 @@ const PostScreen = ({ post }) => {
     };
 
     return (
-        /*
-        <div className="post-card">
-            <p><strong>{post.owner}</strong></p>
-            <p>{post.content}</p>
-            {post.imageHash && (
-                <img
-                    src={imageUrl}
-                    alt="Post"
-                    onError={(e) => {
-                        console.error("Image failed to load:", imageUrl);
-                        e.target.src = "https://placehold.co/300x200";
-                    }}
-                />
-            )}
-            <p>Likes: {post.likes.length}</p>
-            <button onClick={handleLike} aria-label="Like post">
-                Like
-            </button>
-            <div>
-                <input
-                    type="text"
-                    placeholder="Add a comment..."
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    aria-label="Comment input"
-                />
-                <button onClick={handleComment} aria-label="Submit comment">
-                    Comment
-                </button>
-            </div>
-            <div>
-                <h4>Comments:</h4>
-                {post.comments.map((comment, index) => (
-                    <p key={index}>
-                        <strong>{comment.commenter}</strong>: {comment.commentText}
-                    </p>
-                ))}
-            </div>
-        </div>
-        */
-        <div className="post-card">
-            {/* Post owner */}
-            <div className="post-owner">
-                <strong>{post.owner}</strong>
+        <div className="post-card modern-friend-post">
+            {/* Post header with avatar, username, and timestamp */}
+            <div className="post-header">
+                <div className="avatar">
+                    <FaUserCircle size={40} color="#4f8cff" />
+                </div>
+                <div className="post-header-info">
+                    <strong className="post-username">{post.owner}</strong>
+                    <span className="post-timestamp">{post.timestamp ? formatDistanceToNow(new Date(Number(post.timestamp) * 1000), { addSuffix: true }) : ''}</span>
+                </div>
             </div>
 
             {/* Post content */}
-            <p className="post-content">{post.content}</p>
+            <p className="post-content modern-content">{post.content}</p>
 
             {/* Post image if available */}
             {post.imageHash && (
                 <img
+                    className="post-image-modern"
                     src={imageUrl}
                     alt="Post"
                     onError={(e) => {
-                        console.error("Image failed to load:", imageUrl);
                         e.target.src = "https://placehold.co/300x200";
                     }}
                 />
             )}
 
             {/* Likes and comments count */}
-            <div className="post-stats">
-                <div className="post-likes">
-                    <span>{post.likes.length} Likes</span>
+            <div className="post-stats modern-stats">
+                <div className="post-likes pill">
+                    <FaRegThumbsUp size={16} style={{ marginRight: 4 }} />
+                    <span>{post.likes.length}</span>
                 </div>
-                <div className="post-comments-count">
-                    <span>{post.comments.length} Comments</span>
+                <div className="post-comments-count pill">
+                    <FaRegCommentDots size={16} style={{ marginRight: 4 }} />
+                    <span>{post.comments.length}</span>
                 </div>
             </div>
 
             {/* Action buttons */}
-            <div className="post-actions">
+            <div className="post-actions modern-actions">
                 <button
                     onClick={handleLike}
                     className={`like-button ${isLiked ? 'active' : ''}`}
                     aria-label="Like post"
                 >
-                    Like
+                    <FaRegThumbsUp size={16} /> Like
                 </button>
                 <button className="comment-button" aria-label="Comment on post">
-                    Comment
+                    <FaRegCommentDots size={16} /> Comment
                 </button>
             </div>
 
             {/* Comment input */}
-            <div className="comment-input-container">
+            <div className="comment-input-container modern-comment-input">
                 <input
                     type="text"
                     placeholder="Write a comment..."
@@ -164,14 +134,15 @@ const PostScreen = ({ post }) => {
             </div>
 
             {/* Comments section */}
-            <div className="comments-section">
+            <div className="comments-section modern-comments">
                 <h4>Comments</h4>
                 {post.comments.map((comment, index) => (
-                    <div className="comment" key={index}>
-                        <p>
+                    <div className="comment modern-comment" key={index}>
+                        <FaUserCircle size={24} color="#aaa" style={{ marginRight: 8 }} />
+                        <div>
                             <strong>{comment.commenter}</strong>
-                            {comment.commentText}
-                        </p>
+                            <span className="comment-text"> {comment.commentText}</span>
+                        </div>
                     </div>
                 ))}
             </div>

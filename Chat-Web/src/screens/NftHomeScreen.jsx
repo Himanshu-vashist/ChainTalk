@@ -47,10 +47,7 @@ const NFTHomeScreen = () => {
   }, []);
 
   const handleNavigation = (screen) => {
-    navigation.navigate(screen, {
-      showBackButton: true,
-      onBackPress: () => navigation.navigate('NFTHome'),
-    });
+    navigation.navigate(screen);
   };
 
   return (
