@@ -49,22 +49,34 @@ const MarketScreen = () => {
       }),
     ]).start();
   }, []);
-
-  const filteredNFTs = allNFTs?.filter(nft => 
-    nft.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    nft.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+  const formattedNFTs = allNFTs?.map((nft) => ({
+    id: nft[0] ? nft[0].toString() : "0",
+    owner: nft[1] || "",
+    title: nft[2] || "",
+    price: nft[3] ? ethers.formatEther(nft[3]) : "0",
+    description: nft[4] || "",
+    originalHash: nft[5] || "",
+    previewHash: nft[6] || "",
+    timestamp: nft[7] ? nft[7].toString() : "0",
+    isSold: nft[8] || false,
+  })) || [];
+  const filteredNFTs = formattedNFTs.filter(
+    (nft) =>
+      nft.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      nft.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleBuy = async (nft) => {
     try {
       if (!nft.id || !nft.price) {
-        throw new Error('Invalid NFT data');
+        console.log("Invalid NFT:", nft);
+        throw new Error("Invalid NFT data");
       }
       await buyNFT(nft.id, nft.price);
       setLocalError(null);
     } catch (err) {
-      console.error('Buy NFT error:', err);
-      setLocalError(err.message || 'Failed to buy NFT');
+      console.error("Buy NFT error:", err);
+      setLocalError(err.message || "Failed to buy NFT");
     }
   };
 
@@ -82,12 +94,12 @@ const MarketScreen = () => {
   const renderNFTItem = ({ item }) => {
     if (!item) return null;
 
-    const imageUri = item.image || item.originalHash || 'https://via.placeholder.com/150';
-    const title = item.title || 'Untitled NFT';
-    const description = item.description || 'No description available';
-    const price = item.price ? `${ethers.formatEther(item.price)} ETH` : 'Price not set';
-    const owner = item.owner || 'Unknown Owner';
-    const tokenId = item.id || item.tokenId;
+    const imageUri = item.previewHash || item.originalHash || "https://via.placeholder.com/150";
+    const title = item.title || "Untitled NFT";
+    const description = item.description || "No description available";
+    const price = item.price ? `${item.price} ETH` : "Price not set";
+    const owner = item.owner || "Unknown Owner";
+    const tokenId = item.id;
 
     return (
       <Animated.View
@@ -102,17 +114,15 @@ const MarketScreen = () => {
       >
         <View style={styles.nftCardContent}>
           <View style={styles.imageContainer}>
-            <Image 
-              source={{ uri: imageUri }} 
+            <Image
+              source={{ uri: imageUri }}
               style={styles.nftImage}
-              defaultSource={{ uri: 'https://via.placeholder.com/150?text=No+Image' }}
-              onError={() => console.log('Image failed to load')}
+              defaultSource={{ uri: "https://via.placeholder.com/150?text=No+Image" }}
+              onError={() => console.log("Image failed to load")}
             />
-            <View style={[styles.priceTag, { backgroundColor: colors.primary + '20' }]}>
+            <View style={[styles.priceTag, { backgroundColor: colors.primary + "20" }]}>
               <MaterialIcons name="currency-ethereum" size={16} color={colors.primary} />
-              <Text style={[styles.priceTagText, { color: colors.primary }]}>
-                {price}
-              </Text>
+              <Text style={[styles.priceTagText, { color: colors.primary }]}>{price}</Text>
             </View>
           </View>
 
@@ -122,21 +132,27 @@ const MarketScreen = () => {
                 {title}
               </Text>
             </View>
-            
-            <Text style={[styles.nftDescription, { color: colors.textSecondary }]} numberOfLines={2}>
+
+            <Text
+              style={[styles.nftDescription, { color: colors.textSecondary }]}
+              numberOfLines={2}
+            >
               {description}
             </Text>
 
             <View style={styles.nftFooter}>
               <View style={styles.ownerContainer}>
                 <MaterialIcons name="person" size={16} color={colors.textSecondary} />
-                <Text style={[styles.ownerText, { color: colors.textSecondary }]} numberOfLines={1}>
+                <Text
+                  style={[styles.ownerText, { color: colors.textSecondary }]}
+                  numberOfLines={1}
+                >
                   {owner}
                 </Text>
               </View>
               <TouchableOpacity
                 style={[styles.buyButton, { backgroundColor: colors.primary }]}
-                onPress={() => handleBuy({ ...item, id: tokenId })}
+                onPress={() => handleBuy(item)}
                 disabled={loading}
               >
                 {loading ? (
