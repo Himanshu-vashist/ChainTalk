@@ -135,15 +135,24 @@ const CreateNFTScreen = () => {
     }
   };
 
+  const handlePriceChange = (text) => {
+    // Only allow numbers and a single decimal point
+    const regex = /^\d*\.?\d*$/;
+    if (text === '' || regex.test(text)) {
+      setPrice(text);
+    }
+  };
+
   const handleCreate = async () => {
     if (!title || !description || !price || !originalImage || !previewImage) {
       Alert.alert('Validation', 'Please fill in all fields and select both images');
       return;
     }
 
-    // Validate price is a number
-    if (isNaN(price) || price <= 0) {
-      Alert.alert('Validation', 'Please enter a valid positive price');
+    // Validate price is a valid number
+    const priceNum = parseFloat(price);
+    if (isNaN(priceNum) || priceNum <= 0) {
+      Alert.alert('Validation', 'Please enter a valid positive price in ETH');
       return;
     }
 
@@ -162,8 +171,8 @@ const CreateNFTScreen = () => {
         setPreviewHash(finalPreviewHash);
       }
 
-      const priceInWei = parseEther(price.toString());
-      await createNFT(title, description, priceInWei, finalOriginalHash, finalPreviewHash);
+      const priceInWei = parseEther(priceNum.toString());
+      await createNFT(title, priceInWei, description, finalOriginalHash, finalPreviewHash);
       navigation.goBack();
       Alert.alert('Success', 'NFT created successfully.');
     } catch (err) {
@@ -303,7 +312,7 @@ const CreateNFTScreen = () => {
               <TextInput
                 style={[styles.priceInput, { color: colors.text }]}
                 value={price}
-                onChangeText={setPrice}
+                onChangeText={handlePriceChange}
                 placeholder="0.00"
                 placeholderTextColor={colors.textSecondary}
                 keyboardType="decimal-pad"

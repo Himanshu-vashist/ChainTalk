@@ -15,6 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import { chatAppContext } from "../Context/ChatAppContext";
 import { useTheme } from '../Context/ThemeContext';
 import { MaterialIcons } from '@expo/vector-icons';
+import { ethers } from 'ethers';
 
 const MarketScreen = () => {
   const { allNFTs, buyNFT, loading, error } = useContext(chatAppContext);
@@ -56,9 +57,13 @@ const MarketScreen = () => {
 
   const handleBuy = async (nft) => {
     try {
-      await buyNFT(nft);
+      if (!nft.id || !nft.price) {
+        throw new Error('Invalid NFT data');
+      }
+      await buyNFT(nft.id, nft.price);
       setLocalError(null);
     } catch (err) {
+      console.error('Buy NFT error:', err);
       setLocalError(err.message || 'Failed to buy NFT');
     }
   };
@@ -80,8 +85,9 @@ const MarketScreen = () => {
     const imageUri = item.image || item.originalHash || 'https://via.placeholder.com/150';
     const title = item.title || 'Untitled NFT';
     const description = item.description || 'No description available';
-    const price = item.price ? `${item.price} ETH` : 'Price not set';
+    const price = item.price ? `${ethers.formatEther(item.price)} ETH` : 'Price not set';
     const owner = item.owner || 'Unknown Owner';
+    const tokenId = item.id || item.tokenId;
 
     return (
       <Animated.View
@@ -130,7 +136,7 @@ const MarketScreen = () => {
               </View>
               <TouchableOpacity
                 style={[styles.buyButton, { backgroundColor: colors.primary }]}
-                onPress={() => handleBuy(item)}
+                onPress={() => handleBuy({ ...item, id: tokenId })}
                 disabled={loading}
               >
                 {loading ? (

@@ -576,7 +576,14 @@ export const ChatAppProvider = ({ children }) => {
             const signer = await provider.getSigner();
             const contract = new Contract(ChatAppAddress, ChatAppABI, signer);
 
-            setMyNFTs(await contract.getMyNFTs());
+            console.log('Fetching my NFTs...');
+            const nfts = await contract.getMyNFTs();
+            console.log('Raw NFTs from contract:', nfts);
+            
+            const formattedNFTs = Array.isArray(nfts) ? nfts : [];
+            console.log('Formatted NFTs:', formattedNFTs);
+            
+            setMyNFTs(formattedNFTs);
         } catch (err) {
             console.error("Error fetching my NFTs:", err);
             setError("Error fetching my NFTs: " + err.message);
@@ -1141,8 +1148,14 @@ export const ChatAppProvider = ({ children }) => {
             const signer = await provider.getSigner();
             const contract = new ethers.Contract(ChatAppAddress, ChatAppABI, signer);
 
+            console.log('Fetching my NFTs...');
             const nfts = await contract.getMyNFTs();
-            setMyNFTs(Array.isArray(nfts) ? nfts : []);
+            console.log('Raw NFTs from contract:', nfts);
+            
+            const formattedNFTs = Array.isArray(nfts) ? nfts : [];
+            console.log('Formatted NFTs:', formattedNFTs);
+            
+            setMyNFTs(formattedNFTs);
         } catch (err) {
             console.error("Error fetching my NFTs:", err);
             setError("Error fetching my NFTs: " + err.message);
