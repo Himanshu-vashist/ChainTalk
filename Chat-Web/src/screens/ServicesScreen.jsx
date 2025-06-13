@@ -19,10 +19,9 @@ const ServicesScreen = () => {
       screen: 'Tokens',
       color: '#6C5CE7'
     },
-   
     {
       id: 2,
-      title: 'more',
+      title: 'Rewards',
       description: 'Check your rewards and achievements.',
       icon: 'stars',
       screen: 'Rewards',

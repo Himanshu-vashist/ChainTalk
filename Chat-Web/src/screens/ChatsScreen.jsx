@@ -13,6 +13,7 @@ import {
     Dimensions,
     Modal,
     Keyboard,
+    useWindowDimensions,
 } from "react-native";
 import { chatAppContext } from "../Context/ChatAppContext";
 import { useNavigation } from "@react-navigation/native";
@@ -50,6 +51,10 @@ const ChatsScreen = () => {
     const scaleAnim = useRef(new Animated.Value(0.9)).current;
     const typingAnim = useRef(new Animated.Value(0)).current;
 
+    const { width } = useWindowDimensions();
+    const isMobile = width < 600;
+    const [showFriendList, setShowFriendList] = useState(true);
+
     useEffect(() => {
         Animated.parallel([
             Animated.timing(fadeAnim, {
@@ -78,6 +83,14 @@ const ChatsScreen = () => {
             checkMessages(selectedFriend.pubkey).then(setHasMessages);
         }
     }, [selectedFriend, readMessage, checkMessages]);
+
+    useEffect(() => {
+        if (isMobile && selectedFriend) {
+            setShowFriendList(false);
+        } else if (!selectedFriend) {
+            setShowFriendList(true);
+        }
+    }, [isMobile, selectedFriend]);
 
     const handleSend = async () => {
         if (!selectedFriend) {
@@ -244,16 +257,19 @@ const ChatsScreen = () => {
                 colors={customColors.headerGradient}
                 style={styles.header}
             >
+                {isMobile && selectedFriend && (
                 <TouchableOpacity
-                    onPress={() => navigation.goBack()}
+                        onPress={() => setSelectedFriend(null)}
                     style={styles.backButton}
                 >
                     <MaterialIcons name="arrow-back" size={24} color={customColors.text} />
                 </TouchableOpacity>
+                )}
                 <Text style={[styles.headerTitle, { color: customColors.text }]}>Chats</Text>
             </LinearGradient>
 
-            <View style={styles.content}>
+            <View style={[styles.content, { flexDirection: isMobile ? 'column' : 'row' }]}>
+                {(!isMobile || showFriendList) && (
                 <Animated.View 
                     style={[
                         styles.friendList,
@@ -263,7 +279,10 @@ const ChatsScreen = () => {
                             transform: [
                                 { translateX: slideAnim },
                                 { scale: scaleAnim }
-                            ]
+                                ],
+                                width: isMobile ? '100%' : SCREEN_WIDTH * 0.3,
+                                height: isMobile ? (selectedFriend ? 0 : undefined) : '100%',
+                                display: isMobile && selectedFriend ? 'none' : 'flex',
                         }
                     ]}
                 >
@@ -307,8 +326,12 @@ const ChatsScreen = () => {
                         )}
                     </ScrollView>
                 </Animated.View>
+                )}
 
-                <View style={[styles.chatArea, { backgroundColor: customColors.background }]}>
+                <View style={[
+                    styles.chatArea,
+                    { backgroundColor: customColors.background, width: isMobile ? '100%' : undefined }
+                ]}>
                     {selectedFriend && (
                         <View style={[styles.chatHeader, { backgroundColor: customColors.card }]}>
                             <View style={styles.chatHeaderInfo}>

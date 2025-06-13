@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   ScrollView,
   Platform,
   Animated,
+  useWindowDimensions,
+  Modal,
 } from 'react-native';
 import { chatAppContext } from '../Context/ChatAppContext';
 import { useTheme } from '../Context/ThemeContext';
@@ -41,6 +43,10 @@ const Navbar = ({ navigation, route }) => {
   const [openModel, setOpenModel] = useState(false);
   const [hoveredItem, setHoveredItem] = useState(null);
   const [activeItem, setActiveItem] = useState(route?.name);
+  const { width } = useWindowDimensions();
+  const isMobile = width < 600;
+  const [menuOpen, setMenuOpen] = useState(false);
+  const slideAnim = useRef(new Animated.Value(-300)).current;
 
   const handleProfilePress = () => {
     navigation.navigate('ProfileStack', {
@@ -53,63 +59,142 @@ const Navbar = ({ navigation, route }) => {
     navigation.navigate(path);
   };
 
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+    Animated.spring(slideAnim, {
+      toValue: menuOpen ? -300 : 0,
+      useNativeDriver: true,
+      tension: 50,
+      friction: 7,
+    }).start();
+  };
+
   return (
     <View style={[
       styles.container, 
       { 
-        backgroundColor: colors.background, 
+        backgroundColor: colors.background,
+        borderBottomColor: colors.border,
       }
     ]}>
-      <View style={styles.innerContainer}>
-        <View style={[styles.logoContainer, { backgroundColor: colors.surface }]}>
+      <View style={[styles.innerContainer, isMobile && { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
+        <View style={styles.logoContainer}>
           <Image source={images.avatar1} style={styles.logo} resizeMode="contain" />
         </View>
 
-        <ScrollView
-          horizontal
-          contentContainerStyle={styles.menuContainer}
-          showsHorizontalScrollIndicator={false}
-        >
-          {menuItems.map((el, i) => {
-            const isActive = activeItem === el.path;
-            const isHovered = hoveredItem === i;
+        {isMobile ? (
+          <TouchableOpacity 
+            onPress={toggleMenu} 
+            style={[styles.menuButton, { backgroundColor: colors.surface }]}
+          >
+            <MaterialIcons 
+              name={menuOpen ? 'close' : 'menu'} 
+              size={28} 
+              color={colors.text} 
+            />
+          </TouchableOpacity>
+        ) : null}
 
-            return (
-              <TouchableOpacity
-                key={i}
-                onPress={() => handleNavigation(el.path)}
-                onMouseEnter={() => Platform.OS === 'web' && setHoveredItem(i)}
-                onMouseLeave={() => Platform.OS === 'web' && setHoveredItem(null)}
-                style={[
-                  styles.menuItemContainer,
-                  {
-                    backgroundColor: isActive
-                      ? colors.activeBackground 
-                      : isHovered
-                      ? colors.hoverBackground 
-                      : 'transparent',
-                  }
-                ]}
-              >
-                <Text
+        {!isMobile ? (
+          <ScrollView
+            horizontal
+            contentContainerStyle={styles.menuContainer}
+            showsHorizontalScrollIndicator={false}
+          >
+            {menuItems.map((el, i) => {
+              const isActive = activeItem === el.path;
+              const isHovered = hoveredItem === i;
+
+              return (
+                <TouchableOpacity
+                  key={i}
+                  onPress={() => handleNavigation(el.path)}
+                  onMouseEnter={() => Platform.OS === 'web' && setHoveredItem(i)}
+                  onMouseLeave={() => Platform.OS === 'web' && setHoveredItem(null)}
                   style={[
-                    styles.menuItemText,
+                    styles.menuItemContainer,
                     {
-                      color: isActive
-                        ? colors.buttonText 
+                      backgroundColor: isActive
+                        ? colors.activeBackground 
                         : isHovered
-                        ? colors.primary 
-                        : colors.text,
+                        ? colors.hoverBackground 
+                        : 'transparent',
                     }
                   ]}
                 >
-                  {el.menu}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
+                  <Text
+                    style={[
+                      styles.menuItemText,
+                      {
+                        color: isActive
+                          ? colors.buttonText 
+                          : isHovered
+                          ? colors.primary 
+                          : colors.text,
+                      }
+                    ]}
+                  >
+                    {el.menu}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        ) : (
+          <Modal
+            visible={menuOpen}
+            transparent
+            animationType="none"
+            onRequestClose={toggleMenu}
+          >
+            <TouchableOpacity 
+              style={styles.modalOverlay} 
+              activeOpacity={1} 
+              onPress={toggleMenu}
+            >
+              <Animated.View 
+                style={[
+                  styles.mobileMenu,
+                  { 
+                    backgroundColor: colors.surface,
+                    transform: [{ translateX: slideAnim }],
+                  }
+                ]}
+              >
+                <ScrollView style={styles.mobileMenuScroll}>
+                  {menuItems.map((el, i) => {
+                    const isActive = activeItem === el.path;
+                    return (
+                      <TouchableOpacity
+                        key={i}
+                        onPress={() => { handleNavigation(el.path); toggleMenu(); }}
+                        style={[
+                          styles.mobileMenuItem,
+                          {
+                            backgroundColor: isActive ? colors.activeBackground : 'transparent',
+                          }
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.mobileMenuItemText,
+                            {
+                              color: isActive ? colors.primary : colors.text,
+                            }
+                          ]}
+                        >
+                          {el.menu}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </Animated.View>
+            </TouchableOpacity>
+          </Modal>
+        )}
 
+        {!isMobile && (
         <View style={styles.walletContainer}>
           <TouchableOpacity 
             onPress={toggleTheme}
@@ -159,6 +244,58 @@ const Navbar = ({ navigation, route }) => {
             </TouchableOpacity>
           )}
         </View>
+        )}
+        {isMobile && (
+          <View style={[styles.walletContainer, { width: '100%', marginTop: 10, justifyContent: 'flex-start' }]}> 
+            <TouchableOpacity 
+              onPress={toggleTheme}
+              style={[styles.themeButton, { backgroundColor: colors.surface }]}
+            >
+              <Text style={[styles.themeButtonText, { color: colors.text }]}>
+                {isDarkMode ? '☀️' : '🌙'}
+              </Text>
+            </TouchableOpacity>
+
+            {!account ? (
+              <TouchableOpacity 
+                onPress={connectWallet} 
+                style={[styles.button, styles.connectButton, { backgroundColor: colors.primary }]}
+              >
+                <Text style={[styles.buttonText, { color: colors.buttonText }]}>Connect Wallet</Text>
+              </TouchableOpacity>
+            ) : !currentUserName ? (
+              <TouchableOpacity 
+                onPress={() => setOpenModel(true)} 
+                style={[styles.button, styles.createAccountButton, { 
+                  backgroundColor: colors.surface,
+                }]}
+              >
+                <Image source={images.create2} style={styles.avatar} />
+                <Text style={[styles.buttonText, { color: colors.text }]}>Create Account</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={[styles.userContainer, { 
+                  backgroundColor: colors.surface,
+                  borderWidth: 1,
+                  borderColor: colors.primary + '40',
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                }]}
+                onPress={handleProfilePress}
+              >
+                <Image
+                  source={{ uri: userImage || 'https://via.placeholder.com/150' }}
+                  style={[styles.avatar, { borderColor: colors.primary }]}
+                />
+                <Text style={[styles.username, { color: colors.text }]}>
+                  {currentUserName || 'Anonymous'}
+                </Text>
+                <MaterialIcons name="chevron-right" size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
       </View>
 
       {openModel && (
@@ -321,6 +458,39 @@ const styles = StyleSheet.create({
   closeErrorButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  menuButton: {
+    padding: 8,
+    borderRadius: 8,
+    marginLeft: 10,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  mobileMenu: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    width: '80%',
+    maxWidth: 300,
+    paddingTop: Platform.OS === 'web' ? 80 : 100,
+    borderRightWidth: 1,
+    borderRightColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  mobileMenuScroll: {
+    flex: 1,
+  },
+  mobileMenuItem: {
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  mobileMenuItemText: {
+    fontSize: 16,
+    fontWeight: '500',
   },
 });
 

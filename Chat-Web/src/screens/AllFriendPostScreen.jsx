@@ -9,6 +9,7 @@ import {
   Platform,
   StatusBar,
   Animated,
+  useWindowDimensions,
 } from 'react-native';
 import { chatAppContext } from '../Context/ChatAppContext';
 import { useTheme } from '../Context/ThemeContext';
@@ -19,6 +20,8 @@ import { PostCard } from './AllPostScreen';
 const AllFriendPostScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme();
+  const { width } = useWindowDimensions();
+  const isMobile = width < 600;
   const {
     fetchFriendsPosts,
     friendsPosts,
@@ -118,10 +121,13 @@ const AllFriendPostScreen = () => {
           data={friendsPosts || []}
           renderItem={({ item, index }) => <PostCard post={item} index={index} />}
           keyExtractor={(item, index) => index.toString()}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[
+            styles.listContent,
+            isMobile && styles.mobileListContent
+          ]}
           showsVerticalScrollIndicator={false}
-          numColumns={2}
-          columnWrapperStyle={styles.columnWrapper}
+          numColumns={isMobile ? 1 : 2}
+          columnWrapperStyle={!isMobile && styles.columnWrapper}
           ListEmptyComponent={() => (
             <View style={styles.emptyContainer}>
               <View style={[styles.emptyIconContainer, { backgroundColor: colors.textSecondary + '15' }]}>
@@ -157,7 +163,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(0,0,0,0.08)',
     ...Platform.select({
@@ -207,6 +213,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 16,
+    padding: 20,
   },
   loadingCircle: {
     width: 60,
@@ -219,6 +226,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 16,
     fontWeight: '500',
+    textAlign: 'center',
   },
   errorContainer: {
     flex: 1,
@@ -255,6 +263,9 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingVertical: 16,
+  },
+  mobileListContent: {
+    paddingHorizontal: 16,
   },
   columnWrapper: {
     justifyContent: 'space-between',

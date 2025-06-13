@@ -567,9 +567,12 @@
     margin-bottom: 2rem;
     transition: box-shadow 0.3s, transform 0.3s;
     border: 1.5px solid #23272f;
-    max-width: 540px;
+    max-width: 320px;
     margin-left: auto;
     margin-right: auto;
+    overflow: visible !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
 }
 .modern-friend-post:hover {
     box-shadow: 0 12px 36px #4f8cff33, 0 2px 12px #0008;
@@ -614,12 +617,15 @@
 }
 .post-image-modern {
     width: 100%;
-    max-width: 420px;
-    border-radius: 1rem;
+    height: auto;
+    max-height: 500px;
+    object-fit: contain;
+    border-radius: 0.75rem;
     box-shadow: 0 4px 16px #0006;
-    margin: 0.5rem auto 1rem auto;
+    margin: 0;
     display: block;
-    border: 1.5px solid #4f8cff22;
+    border: 2px solid #4f8cff44;
+    background: #181c24;
 }
 .modern-stats {
     display: flex;
@@ -717,4 +723,12 @@
     color: #f3f6fa;
     font-size: 1rem;
     margin-left: 0.3rem;
+}
+
+/* Remove overflow and fixed height from any image container if present */
+.post-image-container, .image-container {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: unset !important;
+    max-height: unset !important;
 }

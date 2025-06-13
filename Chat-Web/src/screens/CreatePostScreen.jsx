@@ -17,10 +17,12 @@ import * as ImagePicker from 'expo-image-picker';
 import { chatAppContext } from '../Context/ChatAppContext';
 import { useTheme } from '../Context/ThemeContext';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const CreatePostScreen = () => {
   const { createPost } = useContext(chatAppContext);
   const { colors } = useTheme();
+  const navigation = useNavigation();
   const [content, setContent] = useState('');
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -140,6 +142,10 @@ const CreatePostScreen = () => {
     }
   };
 
+  const handleGeneratePost = () => {
+    navigation.navigate('GeneratePost');
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -198,6 +204,15 @@ const CreatePostScreen = () => {
               </TouchableOpacity>
 
               <TouchableOpacity
+                style={[styles.generateButton, { backgroundColor: colors.secondary }]}
+                onPress={handleGeneratePost}
+                activeOpacity={0.8}
+              >
+                <MaterialIcons name="auto-awesome" size={20} color="#fff" />
+                <Text style={styles.generateButtonText}>Generate Post</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
                 style={[
                   styles.postButton,
                   { backgroundColor: colors.primary },
@@ -252,132 +267,112 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerSection: {
-    borderRadius: 24,
-    padding: 24,
+    padding: 20,
+    borderRadius: 16,
     marginBottom: 16,
-    alignItems: 'center',
     overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
+    position: 'relative',
   },
   headerGradient: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: '60%',
-    borderBottomLeftRadius: 50,
-    borderBottomRightRadius: 50,
+    bottom: 0,
+    opacity: 0.1,
   },
   heading: {
     fontSize: 28,
-    fontWeight: '700',
+    fontWeight: 'bold',
     marginBottom: 8,
   },
   highlight: {
-    // color will be set by theme
+    fontWeight: 'bold',
   },
   subHeading: {
     fontSize: 16,
-    textAlign: 'center',
-    paddingHorizontal: 20,
   },
   contentSection: {
-    borderRadius: 24,
     padding: 20,
-    marginBottom: 20,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
+    borderRadius: 16,
   },
   textArea: {
     minHeight: 120,
-    borderRadius: 12,
+    borderWidth: 1,
+    borderRadius: 8,
     padding: 12,
     fontSize: 16,
     textAlignVertical: 'top',
-    marginBottom: 16,
-    borderWidth: 1,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
-    gap: 10,
+    marginTop: 16,
+    gap: 8,
   },
   imagePicker: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    borderRadius: 12,
+    padding: 12,
+    borderRadius: 8,
     flex: 1,
-    marginRight: 8,
+    justifyContent: 'center',
   },
   imagePickerText: {
     color: '#fff',
+    marginLeft: 8,
     fontSize: 14,
     fontWeight: '600',
+  },
+  generateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    flex: 1,
+    justifyContent: 'center',
+  },
+  generateButtonText: {
+    color: '#fff',
     marginLeft: 8,
+    fontSize: 14,
+    fontWeight: '600',
   },
   postButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 12,
+    padding: 12,
+    borderRadius: 8,
     flex: 1,
+    justifyContent: 'center',
+  },
+  postButtonDisabled: {
+    opacity: 0.7,
   },
   postButtonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
     marginLeft: 8,
-  },
-  postButtonDisabled: {
-    opacity: 0.6,
+    fontSize: 14,
+    fontWeight: '600',
   },
   imagePreviewContainer: {
-    marginTop: 10,
-    alignItems: 'center',
+    marginTop: 16,
     position: 'relative',
-    marginBottom: 16,
   },
   previewImage: {
     width: '100%',
     height: 200,
-    borderRadius: 12,
+    borderRadius: 8,
   },
   removeImage: {
     position: 'absolute',
-    top: 0,
-    right: 0,
-    backgroundColor: 'red',
-    borderRadius: 15,
-    width: 30,
-    height: 30,
+    top: 8,
+    right: 8,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1,
   },
   removeImageText: {
     color: '#fff',
