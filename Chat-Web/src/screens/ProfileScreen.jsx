@@ -100,7 +100,7 @@ const ProfileScreen = ({ navigation }) => {
       ]}
       onPress={() => navigation.navigate(screenName)}
     >
-      <View style={[styles.menuIconContainer, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.15)` }]}>
+      <View style={[styles.menuIconContainer, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1, 3), 16)}, ${parseInt(colors.primary.slice(3, 5), 16)}, ${parseInt(colors.primary.slice(5, 7), 16)}, 0.15)` }]}>
         <MaterialIcons name={icon} size={24} color={colors.primary} />
       </View>
       <Text style={[styles.menuText, { color: colors.text }]}>{title}</Text>
@@ -134,7 +134,7 @@ const ProfileScreen = ({ navigation }) => {
         ]}
       >
         <View style={styles.profileImageContainer}>
-          <Image 
+          <Image
             source={{ uri: userImageUrl }}
             style={[styles.profileImage, { borderColor: colors.primary }]}
           />
@@ -149,9 +149,9 @@ const ProfileScreen = ({ navigation }) => {
       </Animated.View>
 
       <View style={styles.statsContainer}>
-        {renderStatItem('chat', '128', 'Messages')}
-        {renderStatItem('people', '24', 'Friends')}
-        {renderStatItem('stars', myRewardTokens, 'Rewards')}
+        {renderStatItem('chat')}
+        {renderStatItem('people')}
+        {renderStatItem('stars')}
       </View>
 
       <View style={styles.menuSection}>
@@ -194,14 +194,14 @@ const ProfileScreen = ({ navigation }) => {
 
       <TouchableOpacity
         style={[
-          styles.logoutButton, 
-          { 
-            backgroundColor: colors.error, 
+          styles.logoutButton,
+          {
+            backgroundColor: colors.error,
             borderColor: colors.error,
             borderWidth: 1,
           }
         ]}
-        onPress={() => {/* Handle logout */}}
+        onPress={() => {/* Handle logout */ }}
       >
         <MaterialIcons name="logout" size={24} color={colors.buttonText} />
         <Text style={[styles.logoutText, { color: colors.buttonText }]}>Logout</Text>
