@@ -120,45 +120,49 @@ const ModelScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>
-                Create Your <Text style={styles.highlight}>Account</Text>
-            </Text>
-            <Text style={styles.subtitle}>Join the blockchain chat app</Text>
-            <Text style={styles.note}>Ensure all fields are completed accurately.</Text>
+            <View style={styles.formCard}>
+                <Text style={styles.title}>
+                    Create Your <Text style={styles.highlight}>Account</Text>
+                </Text>
+                <Text style={styles.subtitle}>Join the blockchain chat app</Text>
+                <Text style={styles.note}>Ensure all fields are completed accurately.</Text>
 
-            <TextInput
-                style={styles.input}
-                placeholder="Name"
-                placeholderTextColor="#aaa"
-                value={form.name}
-                onChangeText={(value) => handleInputChange("name", value)}
-            />
-
-            <TextInput
-                style={styles.input}
-                placeholder="Physical Address"
-                placeholderTextColor="#aaa"
-                value={form.physicalAddress}
-                onChangeText={(value) => handleInputChange("physicalAddress", value)}
-            />
-
-            <TouchableOpacity onPress={pickImage} style={styles.uploadBtn}>
-                <Text style={styles.uploadText}>{image ? "Image Selected" : "Pick an Image"}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={handleSubmit} style={styles.button}>
-                <Text style={styles.buttonText}>Create Account</Text>
-            </TouchableOpacity>
-
-            {error ? <Text style={styles.error}>{error}</Text> : null}
-
-            {image && (
-                <Image
-                    source={{ uri: image.uri }}
-                    style={styles.preview}
-                    resizeMode="contain"
+                <TextInput
+                    style={styles.input}
+                    placeholder="Name"
+                    placeholderTextColor="#aaa"
+                    value={form.name}
+                    onChangeText={(value) => handleInputChange("name", value)}
                 />
-            )}
+
+                <TextInput
+                    style={styles.input}
+                    placeholder="Physical Address"
+                    placeholderTextColor="#aaa"
+                    value={form.physicalAddress}
+                    onChangeText={(value) => handleInputChange("physicalAddress", value)}
+                />
+
+                <TouchableOpacity onPress={pickImage} style={styles.uploadBtn}>
+                    <Text style={styles.uploadText}>
+                        {image ? "✅ Image Selected" : "📁 Pick an Image"}
+                    </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={handleSubmit} style={styles.button}>
+                    <Text style={styles.buttonText}>Create Account</Text>
+                </TouchableOpacity>
+
+                {error ? <Text style={styles.error}>{error}</Text> : null}
+
+                {image && (
+                    <Image
+                        source={{ uri: image.uri }}
+                        style={styles.preview}
+                        resizeMode="cover"
+                    />
+                )}
+            </View>
         </View>
     );
 };
@@ -166,16 +170,29 @@ const ModelScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginTop: 500,
-        backgroundColor: "#121212",
-        padding: 20,
-        justifyContent: "center",
+        paddingHorizontal: 20,
+        paddingTop: Platform.OS === "android" ? 80 : 100, // ⬅️ This adds safe space from top
+        justifyContent: "flex-start",
+        alignItems: "center",
+    },
+
+    formCard: {
+        width: "100%",
+        backgroundColor: "#1e1e1e",
+        padding: 24,
+        borderRadius: 12,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.4,
+        shadowRadius: 6,
+        elevation: 8,
     },
     title: {
-        fontSize: 26,
+        fontSize: 28,
         fontWeight: "bold",
         color: "#fff",
         textAlign: "center",
+        marginBottom: 8,
     },
     highlight: {
         color: "orange",
@@ -183,54 +200,64 @@ const styles = StyleSheet.create({
     subtitle: {
         color: "#ccc",
         textAlign: "center",
-        marginTop: 8,
-        fontSize: 14,
+        fontSize: 16,
+        marginBottom: 6,
     },
     note: {
         color: "#aaa",
         textAlign: "center",
-        fontSize: 12,
-        marginVertical: 10,
+        fontSize: 13,
+        marginBottom: 16,
     },
     input: {
-        backgroundColor: "#1e1e1e",
-        padding: 12,
-        borderRadius: 6,
-        marginVertical: 6,
+        backgroundColor: "#2a2a2a",
+        padding: 14,
+        borderRadius: 8,
+        marginBottom: 12,
         color: "#fff",
+        fontSize: 15,
+        borderColor: "#444",
+        borderWidth: 1,
     },
     uploadBtn: {
         backgroundColor: "#333",
-        padding: 12,
-        borderRadius: 6,
-        marginVertical: 10,
+        paddingVertical: 12,
+        borderRadius: 8,
+        marginBottom: 14,
         alignItems: "center",
+        borderWidth: 1,
+        borderColor: "#555",
     },
     uploadText: {
         color: "orange",
         fontWeight: "600",
+        fontSize: 15,
     },
     button: {
         backgroundColor: "orange",
-        padding: 14,
-        borderRadius: 6,
+        paddingVertical: 14,
+        borderRadius: 8,
         alignItems: "center",
-        marginTop: 10,
+        marginTop: 6,
     },
     buttonText: {
         color: "#fff",
         fontWeight: "bold",
+        fontSize: 16,
     },
     error: {
         color: "red",
         textAlign: "center",
         marginTop: 10,
+        fontSize: 14,
     },
     preview: {
-        marginTop: 16,
+        marginTop: 20,
         width: "100%",
-        height: 180,
-        borderRadius: 6,
+        height: 200,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: "#555",
     },
 });
 
