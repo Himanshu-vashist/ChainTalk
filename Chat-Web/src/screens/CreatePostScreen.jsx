@@ -17,10 +17,12 @@ import * as ImagePicker from 'expo-image-picker';
 import { chatAppContext } from '../Context/ChatAppContext';
 import { useTheme } from '../Context/ThemeContext';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const CreatePostScreen = () => {
   const { createPost } = useContext(chatAppContext);
   const { colors } = useTheme();
+  const navigation = useNavigation();
   const [content, setContent] = useState('');
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -140,6 +142,10 @@ const CreatePostScreen = () => {
     }
   };
 
+  const handleGeneratePost = () => {
+    navigation.navigate('GeneratePost');
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -164,7 +170,7 @@ const CreatePostScreen = () => {
               Create<Text style={[styles.highlight, { color: colors.primary }]}> Post</Text>
             </Text>
             <Text style={[styles.subHeading, { color: colors.textSecondary }]}>
-              Share your thoughts and images on the blockchain!
+              Share your thoughts!
             </Text>
           </View>
 
@@ -195,6 +201,15 @@ const CreatePostScreen = () => {
                 <Text style={styles.imagePickerText}>
                   {image ? 'Change' : 'Add'} Photo
                 </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.generateButton, { backgroundColor: colors.secondary }]}
+                onPress={handleGeneratePost}
+                activeOpacity={0.8}
+              >
+                <MaterialIcons name="auto-awesome" size={20} color="#fff" />
+                <Text style={styles.generateButtonText}>Generate Post</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -252,22 +267,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerSection: {
-    borderRadius: 24,
-    padding: 24,
+    padding: 20,
+    borderRadius: 16,
     marginBottom: 16,
-    alignItems: 'center',
     overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
+    position: 'relative',
   },
   headerGradient: {
     position: 'absolute',
@@ -275,143 +279,105 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    opacity: 0.5,
+    opacity: 0.1,
   },
   heading: {
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 8,
-    textAlign: 'center',
   },
   highlight: {
     fontWeight: 'bold',
   },
   subHeading: {
     fontSize: 16,
-    textAlign: 'center',
-    lineHeight: 22,
   },
   contentSection: {
-    borderRadius: 24,
-    padding: 24,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
+    padding: 20,
+    borderRadius: 16,
   },
   textArea: {
-    borderRadius: 16,
-    padding: 16,
-    fontSize: 16,
     minHeight: 120,
-    marginBottom: 16,
     borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
     textAlignVertical: 'top',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 16,
+    marginTop: 16,
+    gap: 8,
   },
   imagePicker: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     padding: 12,
-    borderRadius: 16,
-    gap: 8,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
+    borderRadius: 8,
+    flex: 1,
+    justifyContent: 'center',
   },
   imagePickerText: {
     color: '#fff',
+    marginLeft: 8,
     fontSize: 14,
     fontWeight: '600',
   },
-  imagePreviewContainer: {
-    position: 'relative',
-    marginBottom: 16,
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  previewImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 16,
-  },
-  removeImage: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
-  },
-  removeImageText: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
-    lineHeight: 24,
-  },
-  postButton: {
-    flex: 1,
+  generateButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     padding: 12,
-    borderRadius: 16,
-    gap: 8,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
+    borderRadius: 8,
+    flex: 1,
+    justifyContent: 'center',
+  },
+  generateButtonText: {
+    color: '#fff',
+    marginLeft: 8,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  postButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    flex: 1,
+    justifyContent: 'center',
   },
   postButtonDisabled: {
     opacity: 0.7,
   },
   postButtonText: {
     color: '#fff',
+    marginLeft: 8,
     fontSize: 14,
     fontWeight: '600',
+  },
+  imagePreviewContainer: {
+    marginTop: 16,
+    position: 'relative',
+  },
+  previewImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+  },
+  removeImage: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  removeImageText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

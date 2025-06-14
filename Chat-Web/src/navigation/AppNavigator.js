@@ -24,6 +24,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import AchievementsScreen from '../screens/AchievementsScreen';
 import RewardsScreen from '../screens/RewardsScreen';
+import GeneratePostScreen from '../screens/GeneratePostScreen';
 
 import Navbar from '../Components/Navbar';
 
@@ -59,6 +60,7 @@ function ServicesStackScreen() {
     <ServicesStack.Navigator screenOptions={{ headerShown: false }}>
       <ServicesStack.Screen name="Services" component={ServicesScreen} />
       <ServicesStack.Screen name="Tokens" component={TokenScreen} />
+      <ServicesStack.Screen name="Rewards" component={RewardsScreen} />
     </ServicesStack.Navigator>
   );
 }
@@ -94,6 +96,7 @@ const Navigation = () => {
         <Stack.Screen name="PendingRequest" component={PendingRequestScreen} />
         <Stack.Screen name="CreatePost" component={CreatePostScreen} />
         <Stack.Screen name="UserCard" component={UserCardScreen} />
+        <Stack.Screen name="GeneratePost" component={GeneratePostScreen} />
 
         {/* Nested Navigators */}
         <Stack.Screen name="TotalPostStack" component={TotalPostStackScreen} />

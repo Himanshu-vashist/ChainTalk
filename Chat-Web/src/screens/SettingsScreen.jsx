@@ -57,10 +57,12 @@ const SettingsScreen = () => {
           backgroundColor: colors.surface,
           opacity: fadeAnim,
           transform: [{ translateY }],
+          borderColor: colors.border,
+          borderWidth: 1,
         },
       ]}
     >
-      <View style={[styles.iconContainer, { backgroundColor: colors.primary + '15' }]}>
+      <View style={[styles.iconContainer, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.15)` }]}>
         <MaterialIcons name={icon} size={24} color={colors.primary} />
       </View>
       <View style={styles.settingContent}>
@@ -73,8 +75,9 @@ const SettingsScreen = () => {
         <Switch
           value={value}
           onValueChange={onValueChange}
-          trackColor={{ false: colors.textSecondary + '40', true: colors.primary + '40' }}
-          thumbColor={value ? colors.primary : colors.textSecondary}
+          trackColor={{ false: colors.textSecondary, true: colors.primary }}
+          thumbColor={Platform.OS === 'android' ? (value ? colors.primary : colors.textSecondary) : ''}
+          ios_backgroundColor={colors.textSecondary + '40'}
         />
       ) : (
         <MaterialIcons name="chevron-right" size={24} color={colors.textSecondary} />
@@ -94,6 +97,8 @@ const SettingsScreen = () => {
             backgroundColor: colors.surface,
             opacity: fadeAnim,
             transform: [{ translateY }],
+            borderColor: colors.border,
+            borderBottomWidth: 1,
           },
         ]}
       >
@@ -252,9 +257,11 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 16,
+    lineHeight: 22,
   },
   section: {
-    padding: 16,
+    marginBottom: 20,
+    paddingHorizontal: 16,
   },
   sectionTitle: {
     fontSize: 20,
@@ -264,8 +271,8 @@ const styles = StyleSheet.create({
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
     borderRadius: 16,
+    padding: 16,
     marginBottom: 12,
     ...Platform.select({
       ios: {
@@ -280,23 +287,24 @@ const styles = StyleSheet.create({
     }),
   },
   iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
-    marginRight: 12,
+    justifyContent: 'center',
+    marginRight: 16,
   },
   settingContent: {
     flex: 1,
+    marginRight: 16,
   },
   settingTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
     marginBottom: 4,
   },
   settingDescription: {
-    fontSize: 14,
+    fontSize: 13,
   },
 });
 

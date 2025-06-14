@@ -90,13 +90,13 @@ const NotificationsScreen = () => {
   const getNotificationColor = (type) => {
     switch (type) {
       case 'message':
-        return '#4CAF50';
+        return colors.primary;
       case 'friend':
-        return '#2196F3';
+        return colors.secondary;
       case 'reward':
-        return '#FFC107';
+        return colors.primary;
       case 'system':
-        return '#9C27B0';
+        return colors.textSecondary;
       default:
         return colors.primary;
     }
@@ -114,10 +114,12 @@ const NotificationsScreen = () => {
             backgroundColor: colors.surface,
             opacity: fadeAnim,
             transform: [{ translateY }],
+            borderColor: colors.border,
+            borderWidth: 1,
           },
         ]}
       >
-        <View style={[styles.iconContainer, { backgroundColor: iconColor + '15' }]}>
+        <View style={[styles.iconContainer, { backgroundColor: `rgba(${parseInt(iconColor.slice(1,3), 16)}, ${parseInt(iconColor.slice(3,5), 16)}, ${parseInt(iconColor.slice(5,7), 16)}, 0.15)` }]}>
           <MaterialIcons name={getNotificationIcon(notification.type)} size={24} color={iconColor} />
         </View>
         <View style={styles.notificationContent}>
@@ -149,12 +151,14 @@ const NotificationsScreen = () => {
             backgroundColor: colors.surface,
             opacity: fadeAnim,
             transform: [{ translateY }],
+            borderColor: colors.border,
+            borderBottomWidth: 1,
           },
         ]}
       >
         <Text style={[styles.headerTitle, { color: colors.text }]}>Notifications</Text>
         <TouchableOpacity
-          style={[styles.clearButton, { backgroundColor: colors.primary + '15' }]}
+          style={[styles.clearButton, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.15)` }]}
           onPress={() => setNotifications([])}
         >
           <MaterialIcons name="clear-all" size={20} color={colors.primary} />
@@ -175,6 +179,9 @@ const NotificationsScreen = () => {
           style={[
             styles.emptyState,
             {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+              borderWidth: 1,
               opacity: fadeAnim,
               transform: [{ translateY }],
             },
@@ -216,6 +223,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: 'bold',
+    marginBottom: 4,
   },
   clearButton: {
     flexDirection: 'row',
@@ -226,13 +234,15 @@ const styles = StyleSheet.create({
   },
   clearButtonText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   notificationsList: {
     flex: 1,
+    paddingHorizontal: 16,
+    marginTop: 20,
   },
   notificationsListContent: {
-    padding: 16,
+    paddingBottom: 20,
   },
   notificationItem: {
     flexDirection: 'row',
@@ -256,44 +266,58 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    justifyContent: 'center',
+    marginRight: 16,
   },
   notificationContent: {
     flex: 1,
   },
   notificationHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 4,
   },
   notificationTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   notificationTime: {
     fontSize: 12,
   },
   notificationDescription: {
-    fontSize: 14,
+    fontSize: 13,
   },
   unreadDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginLeft: 8,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginLeft: 10,
   },
   emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
+    borderRadius: 24,
+    margin: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
   },
   emptyStateText: {
     fontSize: 16,
     marginTop: 16,
+    textAlign: 'center',
   },
 });
 

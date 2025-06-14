@@ -100,17 +100,18 @@ const AchievementsScreen = () => {
   }, []);
 
   const getCategoryColor = (category) => {
+    // Using theme colors for consistency
     switch (category) {
       case 'messaging':
-        return '#4CAF50';
+        return colors.primary; 
       case 'social':
-        return '#2196F3';
+        return colors.secondary; 
       case 'special':
-        return '#9C27B0';
+        return colors.error; // Using error color for special for contrast
       case 'time':
-        return '#FF9800';
+        return colors.textSecondary; // Using textSecondary for time-based for a softer look
       case 'speed':
-        return '#F44336';
+        return colors.primary; 
       default:
         return colors.primary;
     }
@@ -132,10 +133,12 @@ const AchievementsScreen = () => {
             backgroundColor: colors.surface,
             opacity: fadeAnim,
             transform: [{ translateY }],
+            borderColor: colors.border, // Added border
+            borderWidth: 1, // Added border
           },
         ]}
       >
-        <View style={[styles.iconContainer, { backgroundColor: categoryColor + '15' }]}>
+        <View style={[styles.iconContainer, { backgroundColor: `rgba(${parseInt(categoryColor.slice(1,3), 16)}, ${parseInt(categoryColor.slice(3,5), 16)}, ${parseInt(categoryColor.slice(5,7), 16)}, 0.15)` }]}> {/* Use rgba for transparency */}
           <MaterialIcons name={achievement.icon} size={32} color={categoryColor} />
         </View>
         <View style={styles.achievementContent}>
@@ -143,7 +146,7 @@ const AchievementsScreen = () => {
             <Text style={[styles.achievementTitle, { color: colors.text }]}>
               {achievement.title}
             </Text>
-            <View style={[styles.rewardBadge, { backgroundColor: categoryColor + '15' }]}>
+            <View style={[styles.rewardBadge, { backgroundColor: `rgba(${parseInt(categoryColor.slice(1,3), 16)}, ${parseInt(categoryColor.slice(3,5), 16)}, ${parseInt(categoryColor.slice(5,7), 16)}, 0.15)` }]}> {/* Use rgba for transparency */}
               <MaterialIcons name="stars" size={16} color={categoryColor} />
               <Text style={[styles.rewardText, { color: categoryColor }]}>
                 {achievement.reward}
@@ -154,7 +157,7 @@ const AchievementsScreen = () => {
             {achievement.description}
           </Text>
           <View style={styles.progressContainer}>
-            <View style={[styles.progressBackground, { backgroundColor: colors.textSecondary + '20' }]}>
+            <View style={[styles.progressBackground, { backgroundColor: `rgba(${parseInt(colors.textSecondary.slice(1,3), 16)}, ${parseInt(colors.textSecondary.slice(3,5), 16)}, ${parseInt(colors.textSecondary.slice(5,7), 16)}, 0.2)` }]}> {/* Use rgba for transparency */}
               <Animated.View
                 style={[
                   styles.progressBar,
@@ -175,7 +178,7 @@ const AchievementsScreen = () => {
         </View>
         {achievement.unlocked && (
           <View style={[styles.unlockedBadge, { backgroundColor: categoryColor }]}>
-            <MaterialIcons name="check" size={20} color="#fff" />
+            <MaterialIcons name="check" size={20} color={colors.buttonText} /> {/* Adjusted icon color */}
           </View>
         )}
       </Animated.View>
@@ -191,6 +194,8 @@ const AchievementsScreen = () => {
             backgroundColor: colors.surface,
             opacity: fadeAnim,
             transform: [{ translateY }],
+            borderColor: colors.border, // Added border
+            borderBottomWidth: 1, // Added border
           },
         ]}
       >
@@ -200,7 +205,7 @@ const AchievementsScreen = () => {
             Complete tasks to earn rewards
           </Text>
         </View>
-        <View style={[styles.statsContainer, { backgroundColor: colors.primary + '15' }]}>
+        <View style={[styles.statsContainer, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.15)` }]}> {/* Use rgba for transparency */}
           <MaterialIcons name="stars" size={24} color={colors.primary} />
           <Text style={[styles.statsText, { color: colors.primary }]}>
             {achievements.filter(a => a.unlocked).length}/{achievements.length}
@@ -249,30 +254,36 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 16,
+    lineHeight: 22,
   },
   statsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     borderRadius: 20,
     gap: 8,
   },
   statsText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   achievementsList: {
     flex: 1,
+    paddingHorizontal: 16,
+    marginTop: 20,
   },
   achievementsListContent: {
-    padding: 16,
+    paddingBottom: 20,
   },
   achievementCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
     borderRadius: 16,
+    padding: 16,
     marginBottom: 12,
+    position: 'relative',
+    overflow: 'hidden',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -286,11 +297,11 @@ const styles = StyleSheet.create({
     }),
   },
   iconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    justifyContent: 'center',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 16,
   },
   achievementContent: {
@@ -298,28 +309,40 @@ const styles = StyleSheet.create({
   },
   achievementHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 4,
   },
   achievementTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
-  achievementDescription: {
-    fontSize: 14,
-    marginBottom: 12,
-  },
-  progressContainer: {
+  rewardBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    gap: 4,
   },
-  progressBackground: {
-    flex: 1,
+  rewardText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  achievementDescription: {
+    fontSize: 13,
+    marginBottom: 8,
+  },
+  progressContainer: {
+    width: '100%',
     height: 8,
     borderRadius: 4,
     overflow: 'hidden',
+  },
+  progressBackground: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 4,
   },
   progressBar: {
     height: '100%',
@@ -327,30 +350,18 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 12,
-    minWidth: 40,
+    marginTop: 4,
     textAlign: 'right',
-  },
-  rewardBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 4,
-  },
-  rewardText: {
-    fontSize: 14,
-    fontWeight: '600',
   },
   unlockedBadge: {
     position: 'absolute',
-    top: 16,
-    right: 16,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: 'center',
+    top: 10,
+    right: 10,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

@@ -557,3 +557,178 @@
         height: 28px;
     }
 }
+
+/* --- Modern Friend Post Section --- */
+.modern-friend-post {
+    background: linear-gradient(135deg, #181c24 60%, #23272f 100%);
+    border-radius: 1.2rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25), 0 1.5px 8px #4f8cff22;
+    padding: 1.5rem 1.5rem 1.2rem 1.5rem;
+    margin-bottom: 2rem;
+    transition: box-shadow 0.3s, transform 0.3s;
+    border: 1.5px solid #23272f;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: visible !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+}
+.modern-friend-post:hover {
+    box-shadow: 0 12px 36px #4f8cff33, 0 2px 12px #0008;
+    transform: translateY(-4px) scale(1.01);
+}
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+.avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #181c24;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px #4f8cff22;
+}
+.post-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+.post-username {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #4f8cff;
+}
+.post-timestamp {
+    font-size: 0.9rem;
+    color: #aaa;
+    font-style: italic;
+}
+.modern-content {
+    font-size: 1.15rem;
+    color: #f3f6fa;
+    margin: 0.5rem 0 1rem 0;
+    line-height: 1.6;
+}
+.post-image-modern {
+    width: 100%;
+    height: auto;
+    max-height: 500px;
+    object-fit: contain;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 16px #0006;
+    margin: 0;
+    display: block;
+    border: 2px solid #4f8cff44;
+    background: #181c24;
+}
+.modern-stats {
+    display: flex;
+    gap: 1.2rem;
+    margin: 0.5rem 0 0.5rem 0;
+}
+.pill {
+    background: #23272f;
+    border-radius: 999px;
+    padding: 0.25rem 0.9rem 0.25rem 0.7rem;
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    color: #4f8cff;
+    font-weight: 600;
+    box-shadow: 0 1px 4px #4f8cff11;
+}
+.modern-actions {
+    display: flex;
+    gap: 1rem;
+    margin: 0.5rem 0 0.5rem 0;
+}
+.modern-actions button {
+    background: linear-gradient(90deg, #4f8cff 60%, #1e90ff 100%);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 0.5rem 1.3rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px #4f8cff22;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.2s, transform 0.2s;
+}
+.modern-actions button:hover {
+    background: linear-gradient(90deg, #1e90ff 60%, #4f8cff 100%);
+    transform: scale(1.04);
+}
+.modern-comment-input {
+    display: flex;
+    gap: 0.5rem;
+    margin: 0.7rem 0 0.5rem 0;
+}
+.modern-comment-input input[type="text"] {
+    flex: 1;
+    border-radius: 999px;
+    border: 1.5px solid #4f8cff44;
+    padding: 0.6rem 1.1rem;
+    font-size: 1rem;
+    background: #181c24;
+    color: #fff;
+    outline: none;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+.modern-comment-input input[type="text"]:focus {
+    border: 1.5px solid #4f8cff;
+    box-shadow: 0 0 8px #4f8cff33;
+}
+.modern-comment-input button {
+    background: #4f8cff;
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+.modern-comment-input button:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+}
+.modern-comments {
+    margin-top: 1.2rem;
+}
+.modern-comment {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    background: #23272f;
+    border-radius: 0.7rem;
+    padding: 0.6rem 1rem;
+    margin-bottom: 0.6rem;
+    box-shadow: 0 1px 4px #4f8cff11;
+}
+.modern-comment strong {
+    color: #4f8cff;
+    font-size: 1rem;
+}
+.comment-text {
+    color: #f3f6fa;
+    font-size: 1rem;
+    margin-left: 0.3rem;
+}
+
+/* Remove overflow and fixed height from any image container if present */
+.post-image-container, .image-container {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: unset !important;
+    max-height: unset !important;
+}

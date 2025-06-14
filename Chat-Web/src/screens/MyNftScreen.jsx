@@ -14,9 +14,10 @@ import { useNavigation } from "@react-navigation/native";
 import { chatAppContext } from "../Context/ChatAppContext";
 import { useTheme } from '../Context/ThemeContext';
 import { MaterialIcons } from '@expo/vector-icons';
+import { ethers } from 'ethers';
 
 const MyNFTScreen = () => {
-  const { account, username, error, getMyNFTs, myNFTs, loading } = useContext(chatAppContext);
+  const { account, username, error, fetchMyNFTs, myNFTs, loading } = useContext(chatAppContext);
   const { colors } = useTheme();
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
@@ -25,6 +26,19 @@ const MyNFTScreen = () => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(-10)).current;
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
+
+  // Transform raw NFT data
+  const formattedNFTs = myNFTs?.map((nft) => ({
+    id: nft[0] ? nft[0].toString() : "0",
+    owner: nft[1] || "",
+    title: nft[2] || "",
+    price: nft[3] ? ethers.formatEther(nft[3]) : "0",
+    description: nft[4] || "",
+    originalHash: nft[5] || "",
+    previewHash: nft[6] || "",
+    timestamp: nft[7] ? nft[7].toString() : "0",
+    isSold: nft[8] || false,
+  })) || [];
 
   useEffect(() => {
     Animated.parallel([
@@ -49,15 +63,23 @@ const MyNFTScreen = () => {
 
   useEffect(() => {
     if (account) {
+      console.log('Account found, fetching NFTs...');
       fetchNFTs();
+    } else {
+      console.log('No account found');
     }
   }, [account]);
 
+  useEffect(() => {
+    console.log('Formatted NFTs:', formattedNFTs);
+  }, [myNFTs]);
+
   const fetchNFTs = async () => {
     try {
-      await getMyNFTs();
+      await fetchMyNFTs();
       setLocalError(null);
     } catch (err) {
+      console.error('Error fetching NFTs:', err);
       setLocalError(err.message || 'Failed to fetch NFTs');
     }
   };
@@ -71,7 +93,12 @@ const MyNFTScreen = () => {
   const renderNFTItem = ({ item }) => {
     if (!item) return null;
 
-    const imageUri = item.image || item.originalHash || 'https://via.placeholder.com/150';
+    // Construct Pinata URL from raw IPFS hash
+    const imageUri = item.originalHash
+      ? `https://gateway.pinata.cloud/ipfs/${item.originalHash.replace('https://gateway.pinata.cloud/ipfs/', '')}`
+      : item.previewHash
+        ? `https://gateway.pinata.cloud/ipfs/${item.previewHash.replace('https://gateway.pinata.cloud/ipfs/', '')}`
+        : 'https://via.placeholder.com/150';
     const title = item.title || 'Untitled NFT';
     const description = item.description || 'No description available';
     const price = item.price ? `${item.price} ETH` : 'Price not set';
@@ -87,11 +114,11 @@ const MyNFTScreen = () => {
           },
         ]}
       >
-        <Image 
-          source={{ uri: imageUri }} 
+        <Image
+          source={{ uri: imageUri }}
           style={styles.nftImage}
           defaultSource={{ uri: 'https://via.placeholder.com/150?text=No+Image' }}
-          onError={() => console.log('Image failed to load')}
+          onError={(e) => console.log(`Image failed to load: ${imageUri}, error: ${e.nativeEvent.error}`)}
         />
         <View style={styles.nftInfo}>
           <Text style={[styles.nftTitle, { color: colors.text }]} numberOfLines={1}>
@@ -99,6 +126,9 @@ const MyNFTScreen = () => {
           </Text>
           <Text style={[styles.nftDescription, { color: colors.textSecondary }]} numberOfLines={2}>
             {description}
+          </Text>
+          <Text style={[styles.nftDescription, { color: colors.textSecondary }]} numberOfLines={2}>
+            Hash of Image: {item.originalHash}
           </Text>
           <View style={styles.nftDetails}>
             <View style={styles.priceContainer}>
@@ -171,7 +201,7 @@ const MyNFTScreen = () => {
         <View style={styles.headerRight} />
       </View>
 
-      {!myNFTs || myNFTs.length === 0 ? (
+      {!formattedNFTs || formattedNFTs.length === 0 ? (
         <View style={styles.emptyContainer}>
           <MaterialIcons name="collections" size={64} color={colors.textSecondary} />
           <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
@@ -187,9 +217,9 @@ const MyNFTScreen = () => {
         </View>
       ) : (
         <FlatList
-          data={myNFTs}
+          data={formattedNFTs}
           renderItem={renderNFTItem}
-          keyExtractor={(item, index) => item?.id || index.toString()}
+          keyExtractor={(item, index) => item.id || index.toString()}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
           refreshing={refreshing}
@@ -208,6 +238,7 @@ const MyNFTScreen = () => {
   );
 };
 
+// Styles remain unchanged
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -266,21 +297,21 @@ const styles = StyleSheet.create({
   },
   nftInfo: {
     padding: 16,
+    gap: 8,
   },
   nftTitle: {
     fontSize: 18,
     fontWeight: '600',
-    marginBottom: 4,
   },
   nftDescription: {
     fontSize: 14,
     lineHeight: 20,
-    marginBottom: 12,
   },
   nftDetails: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginTop: 8,
   },
   priceContainer: {
     flexDirection: 'row',
@@ -289,14 +320,14 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '500',
   },
   sellButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: 8,
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+    borderRadius: 20,
     gap: 4,
   },
   sellButtonText: {
@@ -311,28 +342,25 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    marginTop: 8,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
     gap: 16,
+    padding: 16,
   },
   errorText: {
     fontSize: 16,
     textAlign: 'center',
-    lineHeight: 22,
   },
   retryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 12,
+    paddingHorizontal: 24,
+    borderRadius: 24,
     gap: 8,
-    marginTop: 8,
   },
   retryButtonText: {
     color: '#fff',
@@ -343,22 +371,20 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
     gap: 16,
+    padding: 16,
   },
   emptyText: {
     fontSize: 16,
     textAlign: 'center',
-    lineHeight: 22,
   },
   createButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 12,
+    paddingHorizontal: 24,
+    borderRadius: 24,
     gap: 8,
-    marginTop: 8,
   },
   createButtonText: {
     color: '#fff',

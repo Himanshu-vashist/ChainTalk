@@ -45,7 +45,6 @@ const TotalPostScreen = () => {
   const handleNavigation = (screen) => {
     navigation.navigate(screen, {
       showBackButton: true,
-      onBackPress: () => navigation.navigate('TotalPost'),
     });
   };
 
@@ -106,6 +105,25 @@ const TotalPostScreen = () => {
               <Text style={[styles.buttonTitle, { color: colors.text }]}>Friend's Posts</Text>
               <Text style={[styles.buttonSubtitle, { color: colors.textSecondary }]}>
                 See friend's posts
+              </Text>
+            </View>
+            <MaterialIcons name="chevron-right" size={24} color={colors.textSecondary} />
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: colors.surface }]}
+          onPress={() => handleNavigation('GeneratePost')}
+          activeOpacity={0.8}
+        >
+          <View style={[styles.buttonContent, { backgroundColor: colors.secondary + '10' }]}>
+            <View style={[styles.iconContainer, { backgroundColor: colors.secondary + '20' }]}>
+              <MaterialIcons name="auto-awesome" size={20} color={colors.secondary} />
+            </View>
+            <View style={styles.buttonTextContainer}>
+              <Text style={[styles.buttonTitle, { color: colors.text }]}>Generate Post</Text>
+              <Text style={[styles.buttonSubtitle, { color: colors.textSecondary }]}>
+                Create AI-powered posts
               </Text>
             </View>
             <MaterialIcons name="chevron-right" size={24} color={colors.textSecondary} />

@@ -75,7 +75,7 @@ const HomeScreen = ({ navigation }) => {
       onPress={onPress}
       activeOpacity={0.8}
     >
-      <View style={[styles.quickActionIcon, { backgroundColor: colors.primary + '15' }]}>
+      <View style={[styles.quickActionIcon, { backgroundColor: `rgba(${parseInt(colors.primary.slice(1,3), 16)}, ${parseInt(colors.primary.slice(3,5), 16)}, ${parseInt(colors.primary.slice(5,7), 16)}, 0.15)` }]}>
         <MaterialIcons name={icon} size={24} color={colors.primary} />
       </View>
       <Text style={[styles.quickActionText, { color: colors.text }]}>{title}</Text>
@@ -117,8 +117,8 @@ const HomeScreen = ({ navigation }) => {
                   onPress={() => navigation.navigate('AllUsers')}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.getStartedText}>Connect Wallet</Text>
-                  <MaterialIcons name="account-balance-wallet" size={20} color="#fff" style={styles.btnIcon} />
+                  <Text style={[styles.getStartedText, { color: colors.buttonText }]}>Connect Wallet</Text>
+                  <MaterialIcons name="account-balance-wallet" size={20} color={colors.buttonText} style={styles.btnIcon} />
                 </TouchableOpacity>
               ) : !currentUserName ? (
                 <TouchableOpacity 
@@ -126,8 +126,8 @@ const HomeScreen = ({ navigation }) => {
                   onPress={() => navigation.navigate('AllUsers')}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.getStartedText}>Create Account</Text>
-                  <MaterialIcons name="person-add" size={20} color="#fff" style={styles.btnIcon} />
+                  <Text style={[styles.getStartedText, { color: colors.buttonText }]}>Create Account</Text>
+                  <MaterialIcons name="person-add" size={20} color={colors.buttonText} style={styles.btnIcon} />
                 </TouchableOpacity>
               ) : (
                 <View style={styles.quickActionsContainer}>
@@ -250,70 +250,61 @@ const FeatureCard = ({ image, title, description, colors, icon }) => (
       }
     ]}
   >
-    <View style={styles.featureImageContainer}>
-      <Image source={image} style={styles.featureImage} />
-      <View style={[styles.iconOverlay, { backgroundColor: colors.primary }]}>
-        <Text style={styles.iconText}>{icon}</Text>
-      </View>
+    <View style={[styles.featureIconContainer, { backgroundColor: colors.primary + '15' }]}>
+      <Text style={styles.featureIcon}>{icon}</Text>
     </View>
-    <View style={styles.featureContent}>
-      <Text style={[styles.featureTitle, { color: colors.primary }]}>{title}</Text>
-      <Text style={[styles.featureDesc, { color: colors.textSecondary }]}>{description}</Text>
-    </View>
+    <Text style={[styles.featureTitle, { color: colors.text }]}>{title}</Text>
+    <Text style={[styles.featureDescription, { color: colors.textSecondary }]}>{description}</Text>
   </Animated.View>
 );
 
 const StatItem = ({ icon, value, label, colors }) => (
-  <View style={[styles.statItem, { backgroundColor: colors.background }]}>
-    <MaterialIcons name={icon} size={24} color={colors.primary} />
-    <Text style={[styles.statValue, { color: colors.text }]}>{value}</Text>
+  <View style={[styles.statItem, { backgroundColor: colors.surface }]}>
+    <View style={[styles.statIconContainer, { backgroundColor: colors.primary + '15' }]}>
+      <MaterialIcons name={icon} size={24} color={colors.primary} />
+    </View>
+    <Text style={[styles.statValue, { color: colors.primary }]}>{value}</Text>
     <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{label}</Text>
   </View>
 );
 
 const BenefitItem = ({ icon, title, description, colors }) => (
-  <Animated.View 
-    style={[
-      styles.benefitItem, 
-      { 
-        backgroundColor: colors.background,
-        transform: [{ scale: 1 }],
-      }
-    ]}
-  >
+  <View style={[styles.benefitItem, { backgroundColor: colors.surface }]}>
     <View style={[styles.benefitIconContainer, { backgroundColor: colors.primary + '15' }]}>
-      <Text style={styles.benefitIcon}>{icon}</Text>
+      <Text style={[styles.benefitIcon, { color: colors.primary }]}>{icon}</Text>
     </View>
     <Text style={[styles.benefitTitle, { color: colors.text }]}>{title}</Text>
-    <Text style={[styles.benefitDesc, { color: colors.textSecondary }]}>{description}</Text>
-  </Animated.View>
+    <Text style={[styles.benefitDescription, { color: colors.textSecondary }]}>{description}</Text>
+  </View>
 );
 
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
+    padding: 16,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    flexGrow: 1,
+    paddingBottom: 20,
   },
   content: {
     flex: 1,
   },
   heroSection: {
+    borderRadius: 24,
     padding: 24,
-    paddingTop: Platform.OS === 'ios' ? 60 : 24,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
-    marginBottom: 16,
+    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4.65,
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
       },
       android: {
         elevation: 8,
@@ -321,59 +312,61 @@ const styles = StyleSheet.create({
     }),
   },
   heroText: {
-    alignItems: 'center',
-    marginBottom: 24,
+    flex: 1,
+    marginRight: 20,
   },
   title: {
-    fontSize: 36,
+    fontSize: 32,
     fontWeight: 'bold',
-    textAlign: 'center',
-    letterSpacing: 0.5,
+    marginBottom: 8,
   },
   highlight: {
-    fontWeight: '800',
+    // color will be applied dynamically
   },
   subtitle: {
     fontSize: 16,
-    textAlign: 'center',
-    marginTop: 8,
-    marginBottom: 24,
     lineHeight: 24,
+    marginBottom: 20,
   },
   getStartedBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 25,
-    marginBottom: 16,
+    paddingHorizontal: 20,
+    borderRadius: 16,
+    marginTop: 10,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   getStartedText: {
-    color: '#fff',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
     marginRight: 8,
   },
   btnIcon: {
-    marginLeft: 4,
-  },
-  heroImage: {
-    width: screenWidth * 0.8,
-    height: screenWidth * 0.8,
-    marginTop: 16,
+    // color will be applied dynamically
   },
   quickActionsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
     gap: 12,
-    marginTop: 16,
+    marginTop: 10,
   },
   quickAction: {
+    flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderRadius: 16,
-    width: (screenWidth - 80) / 2,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -387,81 +380,72 @@ const styles = StyleSheet.create({
     }),
   },
   quickActionIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
-    marginBottom: 8,
+    justifyContent: 'center',
+    marginRight: 12,
   },
   quickActionText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '500',
+  },
+  heroImage: {
+    width: screenWidth * 0.4,
+    height: screenWidth * 0.4,
+    maxHeight: 200,
+    maxWidth: 200,
   },
   featuresSection: {
-    padding: 16,
     gap: 16,
-    marginBottom: 16,
+    marginBottom: 24,
   },
   featureCard: {
     borderRadius: 16,
-    overflow: 'hidden',
+    padding: 20,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowRadius: 8,
       },
       android: {
         elevation: 4,
       },
     }),
   },
-  featureImageContainer: {
-    position: 'relative',
-  },
-  featureImage: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-  },
-  iconOverlay: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
+  featureIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
   },
-  iconText: {
-    fontSize: 20,
-  },
-  featureContent: {
-    padding: 16,
+  featureIcon: {
+    fontSize: 24,
   },
   featureTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
     marginBottom: 8,
   },
-  featureDesc: {
+  featureDescription: {
     fontSize: 14,
     lineHeight: 20,
   },
   statsSection: {
     padding: 24,
-    marginBottom: 16,
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
+    marginBottom: 24,
+    borderRadius: 24,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: -2 },
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowRadius: 8,
       },
       android: {
         elevation: 4,
@@ -477,7 +461,7 @@ const styles = StyleSheet.create({
   },
   statItem: {
     width: (screenWidth - 80) / 2,
-    padding: 16,
+    padding: 20,
     borderRadius: 16,
     alignItems: 'center',
     ...Platform.select({
@@ -488,27 +472,47 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
       },
       android: {
-        elevation: 4,
+        elevation: 2,
       },
     }),
   },
+  statIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
   statValue: {
     fontSize: 24,
-    fontWeight: 'bold',
-    marginVertical: 4,
+    fontWeight: '700',
+    marginBottom: 4,
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 13,
     textAlign: 'center',
   },
   benefitsSection: {
     padding: 24,
-    marginBottom: 16,
+    marginBottom: 24,
+    borderRadius: 24,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   sectionTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
+    fontWeight: '700',
+    marginBottom: 20,
   },
   benefitsGrid: {
     flexDirection: 'row',
@@ -518,7 +522,7 @@ const styles = StyleSheet.create({
   },
   benefitItem: {
     width: (screenWidth - 80) / 2,
-    padding: 16,
+    padding: 20,
     borderRadius: 16,
     alignItems: 'center',
     ...Platform.select({
@@ -529,7 +533,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
       },
       android: {
-        elevation: 4,
+        elevation: 2,
       },
     }),
   },
@@ -537,9 +541,9 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    justifyContent: 'center',
+    marginBottom: 12,
   },
   benefitIcon: {
     fontSize: 24,
@@ -547,16 +551,30 @@ const styles = StyleSheet.create({
   benefitTitle: {
     fontSize: 16,
     fontWeight: '600',
-    marginBottom: 4,
-  },
-  benefitDesc: {
-    fontSize: 12,
+    marginBottom: 8,
     textAlign: 'center',
+  },
+  benefitDescription: {
+    fontSize: 13,
+    textAlign: 'center',
+    lineHeight: 18,
   },
   footer: {
     padding: 24,
     alignItems: 'center',
     marginBottom: Platform.OS === 'ios' ? 40 : 24,
+    borderRadius: 24,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   footerText: {
     fontSize: 14,
