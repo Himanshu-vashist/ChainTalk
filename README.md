@@ -51,7 +51,9 @@ A decentralized social media platform built with **React Native**, **Expo**, and
 - Read receipts and online status  
 <img src="https://github.com/user-attachments/assets/09ceb0b3-a6d6-4e0d-83ed-c1d423c54ff3" width="80%" />
 
----
+
+![messanger1](https://github.com/user-attachments/assets/37800a34-380b-4040-8e11-4cae9e7d89f8)
+
 
 ### 6. 📝 Create Post
 
@@ -59,7 +61,8 @@ A decentralized social media platform built with **React Native**, **Expo**, and
 - Media upload, text formatting
 - Post scheduling and drafts  
 <img src="https://github.com/user-attachments/assets/43a1910c-3daa-4f6f-a98a-8e6fcdbf24f9" width="80%" />  
-<img src="https://github.com/user-attachments/assets/d6060242-9766-482b-b17e-e9122eec2e5a" width="80%" />
+
+![post2](https://github.com/user-attachments/assets/5d86708c-ae3d-4f66-baf9-0518f40a96e2)
 
 ---
 
@@ -69,7 +72,8 @@ A decentralized social media platform built with **React Native**, **Expo**, and
 - Infinite scroll with comments and reactions  
 <img src="https://github.com/user-attachments/assets/00946170-4502-41bf-9f1a-7234085732f2" width="80%" />  
 <img src="https://github.com/user-attachments/assets/70d619a7-3d8f-4247-b414-26c240dc6c12" width="80%" />  
-<img src="https://github.com/user-attachments/assets/733253e4-05f3-4e28-aae3-0c056b0389f5" width="80%" />
+
+![post1](https://github.com/user-attachments/assets/9a4ec238-9fe3-4126-bf7b-261273d3f59e)
 
 ---
 
@@ -77,10 +81,11 @@ A decentralized social media platform built with **React Native**, **Expo**, and
 
 - Mint NFTs, set royalties, and preview items
 - Browse, search, and bid on NFTs  
-<img src="https://github.com/user-attachments/assets/0a922d44-fce5-452a-a136-860dc1eb537b" width="80%" />  
-<img src="https://github.com/user-attachments/assets/89395827-e373-4815-a504-4c8894e2828a" width="80%" />  
-<img src="https://github.com/user-attachments/assets/e814a303-6aa1-4b6f-97be-8c0f6ae91818" width="80%" />  
+<img src="https://github.com/user-attachments/assets/0a922d44-fce5-452a-a136-860dc1eb537b" width="80%" />
 <img src="https://github.com/user-attachments/assets/9dc0baa6-a83d-4710-97d7-29b515c39a25" width="80%" />
+<img src="https://github.com/user-attachments/assets/89395827-e373-4815-a504-4c8894e2828a" width="80%" />  
+
+![nft1](https://github.com/user-attachments/assets/f6066c92-d7b6-47d4-9db3-c071437703c5)
 
 ---
 
