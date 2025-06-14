@@ -2,6 +2,8 @@
 
 A **decentralized social media platform** powered by **React Native**, **Expo**, and **Web3**. It features NFT integration, real-time chat, token rewards, social engagement, and much more.
 
+Contract Deployed To sepolia Testnet.
+
 🚀 **Live Demo**: [https://chin-talk-web.vercel.app/](https://chin-talk-web.vercel.app/)
 
 ---
