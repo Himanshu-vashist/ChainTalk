@@ -118,7 +118,7 @@ const CreateNFTScreen = () => {
     try {
       const res = await fetch(url, {
         method: 'POST',
-         headers: {
+        headers: {
           Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI2OWZjZjE4Yi04YzIxLTQxNTMtODQ3NS0xMTI2ODUxZjY4NjciLCJlbWFpbCI6InVqamF3YWxrdW1hcm11a2hlcmplZTMzNUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMzZiNmEwNTRlMGMyOTRiNjNkYzgiLCJzY29wZWRLZXlTZWNyZXQiOiJlMTdkOTU2N2JmYWU1MjRmN2Y3Y2MyYzRhOTk4N2ZhZWQ1NTZlYTY3NjY0NzFjNjI4ZGFmNzQzMmVhMjg3NmFlIiwiZXhwIjoxNzc3MTg3NjkyfQ.mCuTmFcV0b7zGWVX6h1gJSE3vFkd_prv-TwKrv_VrgQ`, // Replace with valid JWT
         },
         body: formData,
@@ -198,8 +198,8 @@ const CreateNFTScreen = () => {
           },
         ]}
       >
-        <TouchableOpacity 
-          style={[styles.backButton, { backgroundColor: colors.primary + '15' }]} 
+        <TouchableOpacity
+          style={[styles.backButton, { backgroundColor: colors.primary + '15' }]}
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
@@ -241,7 +241,7 @@ const CreateNFTScreen = () => {
                   <View style={styles.uploadPlaceholder}>
                     <MaterialIcons name="add-photo-alternate" size={32} color={colors.primary} />
                     <Text style={[styles.uploadText, { color: colors.textSecondary }]}>
-                      Upload Original Image
+                      Upload Original NFT
                     </Text>
                   </View>
                 )}
@@ -260,7 +260,7 @@ const CreateNFTScreen = () => {
                   <View style={styles.uploadPlaceholder}>
                     <MaterialIcons name="add-photo-alternate" size={32} color={colors.primary} />
                     <Text style={[styles.uploadText, { color: colors.textSecondary }]}>
-                      Upload Preview Image
+                      Upload Preview NFT
                     </Text>
                   </View>
                 )}
