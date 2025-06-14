@@ -25,7 +25,8 @@ A decentralized social media platform built with **React Native**, **Expo**, and
 - Profile auto-creation with wallet
 - Secure session handling
 
----
+---![create1](https://github.com/user-attachments/assets/6f59832d-50f9-4da6-afa1-69aa348daebc)
+
 
 ### 3. 🧑‍🤝‍🧑 Add Friends
 
