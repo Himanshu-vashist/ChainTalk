@@ -34,7 +34,7 @@ const GeneratePostScreen = () => {
         <div className="generate-post-container">
             {/* Header with Back Button */}
             <div className="generate-post-header">
-                <button 
+                <button
                     className="back-button"
                     onClick={() => navigation.goBack()}
                 >
@@ -70,7 +70,7 @@ const GeneratePostScreen = () => {
             {/* Main Content */}
             <div className="generate-post-main">
                 <h2 className="generate-post-title">Post Generator</h2>
-                
+
                 <div className="generate-post-input-container">
                     <textarea
                         className="generate-post-input"
@@ -79,7 +79,7 @@ const GeneratePostScreen = () => {
                         placeholder="Enter your topic..."
                         rows={4}
                     />
-                    <button 
+                    <button
                         className={`generate-post-button ${isLoading ? 'loading' : ''}`}
                         onClick={handleSubmit}
                         disabled={isLoading}
@@ -116,10 +116,11 @@ const GeneratePostScreen = () => {
             <style jsx>{`
                 .generate-post-container {
                     display: flex;
-                    min-height: calc(100vh - 64px);
+                    height: 100vh; /* Full viewport height */
                     background-color: #121212;
                     color: #fff;
                     position: relative;
+                    overflow: hidden; /* Prevent container overflow */
                 }
 
                 .generate-post-header {
@@ -159,7 +160,9 @@ const GeneratePostScreen = () => {
                     padding: 20px;
                     display: flex;
                     flex-direction: column;
+                    height: 100%; /* Full height of container */
                     margin-top: 60px;
+                    overflow: hidden; /* Prevent sidebar overflow */
                 }
 
                 .sidebar-header {
@@ -176,7 +179,23 @@ const GeneratePostScreen = () => {
 
                 .history-list {
                     flex: 1;
-                    overflow-y: auto;
+                    overflow-y: auto; /* Enable vertical scrolling */
+                    -webkit-overflow-scrolling: touch; /* Smooth scrolling on touch devices */
+                    scrollbar-width: thin; /* Firefox */
+                    scrollbar-color: #4f8cff #2a2a2a; /* Firefox */
+                }
+
+                .history-list::-webkit-scrollbar {
+                    width: 8px; /* Chrome/Safari */
+                }
+
+                .history-list::-webkit-scrollbar-track {
+                    background: #2a2a2a; /* Track color */
+                }
+
+                .history-list::-webkit-scrollbar-thumb {
+                    background: #4f8cff; /* Thumb color */
+                    border-radius: 4px;
                 }
 
                 .history-item {
@@ -204,6 +223,7 @@ const GeneratePostScreen = () => {
                     max-width: 800px;
                     margin: 0 auto;
                     margin-top: 60px;
+                    overflow-y: auto; /* Allow scrolling in main content if needed */
                 }
 
                 .generate-post-title {
