@@ -2,6 +2,7 @@
 
 A decentralized social media platform built with React Native and Expo, featuring Web3 integration, NFT support, and real-time chat functionality.
 
+🚀 Live Now: https://chin-talk-web.vercel.app/
 ## Features
 
 ### 1. Web3 Authentication & Profile
