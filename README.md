@@ -1,158 +1,135 @@
-
 # Web3 Social Media Platform
 
 A decentralized social media platform built with React Native and Expo, featuring Web3 integration, NFT support, and real-time chat functionality.
 
 ## Features
 
-### Social Features
-- 📱 **User Profiles & Authentication**
-  - Web3 wallet integration
-  - Profile customization
-  - User achievements and rewards
-  - Friend system with pending requests
+### 1. Web3 Authentication & Profile
+- **Wallet Integration**
+  - Connect with MetaMask and other Web3 wallets
+  - Secure wallet connection using WalletConnect
+  - Automatic session management
+  - Profile creation and linking with wallet address
 
-- 📝 **Content Creation**
-  - Create and share posts
-  - Generate AI-powered content
-  - View friends' posts
-  - Post interactions and engagement
+[Add screenshot of wallet connection and profile page]
 
-- 💬 **Real-time Chat**
-  - Instant messaging
-  - Emoji support
+### 2. Social Feed & Posts
+- **Content Creation**
+  - Create text and media posts
+  - AI-powered content generation
+  - Rich text formatting
+  - Media upload support (images, documents)
+  - Post scheduling and drafts
+
+- **Feed Features**
+  - Infinite scroll feed
+  - Post categorization
+  - Engagement metrics
+  - Share and repost functionality
+  - Comment system
+
+[Add screenshot of feed and post creation]
+
+### 3. NFT Marketplace
+- **NFT Creation**
+  - Mint new NFTs
+  - Upload and customize NFT metadata
+  - Set royalty fees
+  - Batch minting support
+  - Preview before minting
+
+- **Marketplace Features**
+  - Browse available NFTs
+  - Filter and search functionality
+  - Price history and statistics
+  - Bidding system
+  - Direct purchase options
+
+[Add screenshot of NFT marketplace and creation]
+
+### 4. Token System
+- **Token Management**
+  - View token balance
+  - Transfer tokens
+  - Transaction history
+  - Token rewards for engagement
+  - Staking options
+
+- **Achievements & Rewards**
+  - Achievement tracking
+  - Reward distribution
+  - Milestone celebrations
+  - Leaderboard system
+  - Special badges and rewards
+
+[Add screenshot of token dashboard and achievements]
+
+### 5. Real-time Chat
+- **Messaging Features**
+  - One-on-one chat
+  - Group chat support
+  - Emoji and sticker support
+  - File sharing
+  - Message reactions
+
+- **Chat Management**
   - Chat history
+  - Message search
   - Online status indicators
+  - Read receipts
+  - Message notifications
 
-### Web3 Features
-- 🎨 **NFT Integration**
-  - Create and mint NFTs
-  - NFT marketplace
-  - NFT gallery
-  - Token management
+[Add screenshot of chat interface]
 
-- 💰 **Token System**
-  - Token rewards
-  - Achievement system
+### 6. Friend System
+- **Social Connections**
+  - Friend requests
+  - Friend suggestions
+  - Connection management
+  - Privacy settings
+  - Block and report functionality
+
+- **Social Features**
+  - Activity feed
+  - Friend recommendations
+  - Mutual connections
+  - Social graph visualization
+  - Connection strength indicators
+
+[Add screenshot of friend system]
+
+### 7. User Profile
+- **Profile Features**
+  - Customizable profile
+  - NFT gallery display
+  - Achievement showcase
+  - Activity history
+  - Profile verification
+
+- **Settings & Preferences**
+  - Notification preferences
+  - Privacy controls
+  - Theme customization
+  - Language selection
+  - Account security
+
+[Add screenshot of profile page]
+
+### 8. Notifications
+- **Notification Types**
+  - Friend requests
+  - Post interactions
+  - NFT activities
   - Token transactions
-  - Wallet integration
+  - System updates
 
-## Tech Stack
+- **Notification Management**
+  - Real-time notifications
+  - Notification center
+  - Custom notification settings
+  - Read/unread status
+  - Notification filters
 
-### Frontend
-- React Native
-- Expo
-- React Navigation
-- React Native Reanimated
-- React Native Gesture Handler
+[Add screenshot of notifications]
 
-### Web3 Integration
-- ethers.js
-- WalletConnect
-- Web3Modal
-
-### Additional Libraries
-- Axios for API calls
-- date-fns for date manipulation
-- AsyncStorage for local storage
-- React Native Vector Icons
-- Expo Image Picker
-- Expo Document Picker
-
-## Getting Started
-
-### Prerequisites
-- Node.js (v14 or higher)
-- npm or yarn
-- Expo CLI
-- MetaMask or other Web3 wallet
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone [repository-url]
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Start the development server:
-   ```bash
-   npm start
-   ```
-
-4. Run on your preferred platform:
-   ```bash
-   # For iOS
-   npm run ios
-   
-   # For Android
-   npm run android
-   
-   # For Web
-   npm run web
-   ```
-
-## Project Structure
-
-```
-src/
-├── Components/     # Reusable UI components
-├── screens/        # Application screens
-│   ├── AllFriendPostScreen.jsx
-│   ├── AllUserScreen.jsx
-│   ├── ChatsScreen.jsx
-│   ├── CreateNftScreen.jsx
-│   ├── GeneratePostScreen.jsx
-│   ├── HomeScreen.jsx
-│   ├── MarketScreen.jsx
-│   ├── ProfileScreen.jsx
-│   └── ...
-├── Backend/        # Backend services
-├── Context/        # React Context providers
-├── contracts/      # Smart contract integration
-├── navigation/     # Navigation configuration
-├── Utils/          # Utility functions
-├── assets/         # Static assets
-└── test/          # Test files
-```
-
-## Key Features Implementation
-
-### Authentication
-- Web3 wallet integration using WalletConnect
-- Secure token storage using AsyncStorage
-- Protected routes and navigation
-
-### NFT Features
-- NFT creation and minting
-- Marketplace integration
-- Gallery view
-- Token management
-
-### Social Features
-- Real-time chat using WebSocket
-- Post creation and sharing
-- Friend system
-- Notifications
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- Built with Expo and React Native
-- Web3 integration powered by ethers.js and WalletConnect
-- UI components and icons from various open-source libraries
+// ... existing code ...
