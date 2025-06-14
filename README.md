@@ -29,14 +29,14 @@ Contract Deployed To sepolia Testnet.
 ### 3. 🧑‍🤝‍🧑 Add Friends
 - Discover users via suggestions or search  
 - Send friend requests directly from profiles  
-<img src="https://github.com/user-attachments/assets/b29fee77-a7ff-4a6f-a6e3-f1fe6927980b" width="80%" />
+<img src="https://github.com/user-attachments/assets/d55be86f-4256-4d89-ad3f-0f2206eaf02f" width="80%" />
 
 ---
 
 ### 4. 🔔 Friend Requests
 - View incoming and outgoing requests  
 - Easily accept or reject connections  
-<img src="https://github.com/user-attachments/assets/d55be86f-4256-4d89-ad3f-0f2206eaf02f" width="80%" />
+<img src="https://github.com/user-attachments/assets/b29fee77-a7ff-4a6f-a6e3-f1fe6927980b" width="80%" />
 
 ---
 
