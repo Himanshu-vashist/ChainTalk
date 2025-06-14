@@ -149,4 +149,85 @@ A decentralized social media platform built with React Native and Expo, featurin
   - Read/unread status
   - Notification filters
 
+### Frontend
+- React Native
+- Expo
+- React Navigation
+- React Native Reanimated
+- React Native Gesture Handler
+
+### Web3 Integration
+- ethers.js
+- WalletConnect
+- Web3Modal
+
+### Additional Libraries
+- Axios for API calls
+- date-fns for date manipulation
+- AsyncStorage for local storage
+- React Native Vector Icons
+- Expo Image Picker
+- Expo Document Picker
+
+## Getting Started
+
+### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn
+- Expo CLI
+- MetaMask or other Web3 wallet
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone [repository-url]
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+    Start the development server:
+   ```bash
+   npm start
+   ```
+
+4. Run on your preferred platform:
+   ```bash
+   # For iOS
+   npm run ios
+   
+   # For Android
+   npm run android
+   
+   # For Web
+   npm run web
+
+   ## Project Structure
+
+```
+src/
+├── Components/     # Reusable UI components
+├── screens/        # Application screens
+│   ├── AllFriendPostScreen.jsx
+│   ├── AllUserScreen.jsx
+│   ├── ChatsScreen.jsx
+│   ├── CreateNftScreen.jsx
+│   ├── GeneratePostScreen.jsx
+│   ├── HomeScreen.jsx
+│   ├── MarketScreen.jsx
+│   ├── ProfileScreen.jsx
+│   └── ...
+├── Backend/        # Backend services
+├── Context/        # React Context providers
+├── contracts/      # Smart contract integration
+├── navigation/     # Navigation configuration
+├── Utils/          # Utility functions
+├── assets/         # Static assets
+└── test/          # Test files
+```
+
+
 
