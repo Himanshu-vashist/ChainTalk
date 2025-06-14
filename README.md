@@ -67,8 +67,10 @@ Contract Deployed To sepolia Testnet.
 ---
 
 ### 8. 🎨 NFT Marketplace
-- Mint NFTs with metadata, set royalties, preview content  
-- Discover and bid on NFTs with filtering and stats  
+- Mint NFTs with metadata, set royalties, preview content.
+- Discover and bid on NFTs with filtering and stats.
+- Automated Payment meathod through smart contarct.
+- Authenticated owner of the NFT.
 <img src="https://github.com/user-attachments/assets/0a922d44-fce5-452a-a136-860dc1eb537b" width="80%" />
 <img src="https://github.com/user-attachments/assets/9dc0baa6-a83d-4710-97d7-29b515c39a25" width="80%" />
 <img src="https://github.com/user-attachments/assets/89395827-e373-4815-a504-4c8894e2828a" width="80%" />
