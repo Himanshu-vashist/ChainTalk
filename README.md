@@ -1,210 +1,150 @@
-# Web3 Social Media Platform
+# 🌐 Web3 Social Media Platform
 
-A decentralized social media platform built with React Native and Expo, featuring Web3 integration, NFT support, and real-time chat functionality.
+A decentralized social media platform built with **React Native**, **Expo**, and **Web3**, featuring NFT integration, real-time chat, token rewards, and more.
 
-🚀 Live Now: https://chin-talk-web.vercel.app/
-## Features
+🚀 **Live Demo**: [https://chin-talk-web.vercel.app/](https://chin-talk-web.vercel.app/)
 
-### 1. Web3 Authentication & Profile
-- **Wallet Integration**
-  - Connect with MetaMask and other Web3 wallets
-  - Secure wallet connection using WalletConnect
-  - Automatic session management
-  - Profile creation and linking with wallet address
-![home](https://github.com/user-attachments/assets/d490d925-2501-496e-9df4-2a9a51ab7c0c)
+---
 
+## 📌 Key Features
 
+---
 
-### 2. Social Feed & Posts
-- **Content Creation**
-  - Create text and media posts
-  - AI-powered content generation
-  - Rich text formatting
-  - Media upload support (images, documents)
-  - Post scheduling and drafts
-  - ![post-home](https://github.com/user-attachments/assets/00946170
-  - -![post-your](https://github.com/user-attachments/assets/70d619a7-3d8f-4247-b414-26c240dc6c12)
-4502-41bf-9f1a-7234085732f2)
-    ![post-friend](https://github.com/user-attachments/assets/733253e4-05f3-4e28-aae3-0c056b0389f5)
+### 1. 🏠 Home Page
 
-![create post](https://github.com/user-attachments/assets/43a1910c-3daa-4f6f-a98a-8e6fcdbf24f9)
-![generate post](https://github.com/user-attachments/assets/d6060242-9766-482b-b17e-e9122eec2e5a)
+- Dynamic feed overview
+- Prompt login or create account
+- Showcase trending posts and NFTs  
+<img src="https://github.com/user-attachments/assets/d490d925-2501-496e-9df4-2a9a51ab7c0c" width="100%" />
 
-- **Feed Features**
-  - Infinite scroll feed
-  - Post categorization
-  - Engagement metrics
-  - Share and repost functionality
-  - Comment system
+---
 
-[Add screenshot of feed and post creation]
+### 2. 🆕 Create Account (Web3 Login)
 
-### 3. NFT Marketplace
-- **NFT Creation**
-  - Mint new NFTs
-  - Upload and customize NFT metadata
-  - Set royalty fees
-  - Batch minting support
-  - Preview before minting
+- MetaMask & WalletConnect support
+- Profile auto-creation with wallet
+- Secure session handling
 
-- **Marketplace Features**
-  - Browse available NFTs
-  - Filter and search functionality
-  - Price history and statistics
-  - Bidding system
-  - Direct purchase options
+---
 
-![nft-market-home](https://github.com/user-attachments/assets/0a922d44-fce5-452a-a136-860dc1eb537b)
-![nft-marketplace](https://github.com/user-attachments/assets/89395827-e373-4815-a504-4c8894e2828a)
-![nft my](https://github.com/user-attachments/assets/e814a303-6aa1-4b6f-97be-8c0f6ae91818)
-![nft-creatw](https://github.com/user-attachments/assets/9dc0baa6-a83d-4710-97d7-29b515c39a25)
+### 3. 🧑‍🤝‍🧑 Add Friends
 
+- Browse other users
+- Add new friends via profile or suggestions  
+<img src="https://github.com/user-attachments/assets/b29fee77-a7ff-4a6f-a6e3-f1fe6927980b" width="80%" />
 
-### 4. Token System
-- **Token Management**
-  - View token balance
-  - Transfer tokens
-  - Transaction history
-  - Token rewards for engagement
-  - Staking options
+---
 
-- **Achievements & Rewards**
-  - Achievement tracking
-  - Reward distribution
-  - Milestone celebrations
-  - Leaderboard system
-  - Special badges and rewards
-![profile](https://github.com/user-attachments/assets/52072ea2-e3bd-4a3f-8997-6ec9cbdb77d2)
+### 4. 🔔 Friend Requests
 
-![token](https://github.com/user-attachments/assets/2919ab45-de28-4ef7-923b-7d93669eeb59)
+- View incoming and outgoing requests
+- Accept or reject requests  
+<img src="https://github.com/user-attachments/assets/d55be86f-4256-4d89-ad3f-0f2206eaf02f" width="80%" />
 
+---
 
-### 5. Real-time Chat
-- **Messaging Features**
-  - One-on-one chat
-  - Group chat support
-  - Emoji and sticker support
-  - File sharing
-  - Message reactions
- 
-    ![messenger](https://github.com/user-attachments/assets/09ceb0b3-a6d6-4e0d-83ed-c1d423c54ff3)
+### 5. 💬 Messenger (Real-time Chat)
 
+- 1-on-1 and group chat
+- File sharing, emoji, reactions
+- Read receipts and online status  
+<img src="https://github.com/user-attachments/assets/09ceb0b3-a6d6-4e0d-83ed-c1d423c54ff3" width="80%" />
 
-- **Chat Management**
-  - Chat history
-  - Message search
-  - Online status indicators
-  - Read receipts
-  - Message notifications
+---
 
+### 6. 📝 Create Post
 
+- AI-powered content generation
+- Media upload, text formatting
+- Post scheduling and drafts  
+<img src="https://github.com/user-attachments/assets/43a1910c-3daa-4f6f-a98a-8e6fcdbf24f9" width="80%" />  
+<img src="https://github.com/user-attachments/assets/d6060242-9766-482b-b17e-e9122eec2e5a" width="80%" />
 
-### 6. Friend System
-- **Social Connections**
-  - Friend requests
-  - Friend suggestions
-  - Connection management
-  - Privacy settings
-  - Block and report functionality
-![pr](https://github.com/user-attachments/assets/b29fee77-a7ff-4a6f-a6e3-f1fe6927980b)
+---
 
-- **Social Features**
-  - Activity feed
-  - Friend recommendations
-  - Mutual connections
-  - Social graph visualization
-  - Connection strength indicators
+### 7. 👀 View Posts & Feed
 
-[Add screenshot of friend system]
-![pending request](https://github.com/user-attachments/assets/d55be86f-4256-4d89-ad3f-0f2206eaf02f)
+- See your posts, friends’ posts, and global feed
+- Infinite scroll with comments and reactions  
+<img src="https://github.com/user-attachments/assets/00946170-4502-41bf-9f1a-7234085732f2" width="80%" />  
+<img src="https://github.com/user-attachments/assets/70d619a7-3d8f-4247-b414-26c240dc6c12" width="80%" />  
+<img src="https://github.com/user-attachments/assets/733253e4-05f3-4e28-aae3-0c056b0389f5" width="80%" />
 
-### 7. User Profile
-- **Profile Features**
-  - Customizable profile
-  - NFT gallery display
-  - Achievement showcase
-  - Activity history
-  - Profile verification
-![profile](https://github.com/user-attachments/assets/21008a36-b8da-455f-98ab-00ce3d786cd8)
+---
 
-- **Settings & Preferences**
-  - Notification preferences
-  - Privacy controls
-  - Theme customization
-  - Language selection
-  - Account security
+### 8. 🎨 NFT Marketplace
 
+- Mint NFTs, set royalties, and preview items
+- Browse, search, and bid on NFTs  
+<img src="https://github.com/user-attachments/assets/0a922d44-fce5-452a-a136-860dc1eb537b" width="80%" />  
+<img src="https://github.com/user-attachments/assets/89395827-e373-4815-a504-4c8894e2828a" width="80%" />  
+<img src="https://github.com/user-attachments/assets/e814a303-6aa1-4b6f-97be-8c0f6ae91818" width="80%" />  
+<img src="https://github.com/user-attachments/assets/9dc0baa6-a83d-4710-97d7-29b515c39a25" width="80%" />
 
-### 8. Notifications
-- **Notification Types**
-  - Friend requests
-  - Post interactions
-  - NFT activities
-  - Token transactions
-  - System updates
+---
 
-- **Notification Management**
-  - Real-time notifications
-  - Notification center
-  - Custom notification settings
-  - Read/unread status
-  - Notification filters
+### 9. 🪙 Token System
+
+- View & transfer token balance
+- Earn rewards via engagement
+- Leaderboards and badges  
+<img src="https://github.com/user-attachments/assets/52072ea2-e3bd-4a3f-8997-6ec9cbdb77d2" width="80%" />  
+<img src="https://github.com/user-attachments/assets/2919ab45-de28-4ef7-923b-7d93669eeb59" width="80%" />
+
+---
+
+### 10. 👤 User Profile
+
+- Display achievements, NFTs, post history
+- Customizable layout and privacy settings  
+<img src="https://github.com/user-attachments/assets/21008a36-b8da-455f-98ab-00ce3d786cd8" width="80%" />
+
+---
+
+### 11. 🔔 Notifications
+
+- Real-time alerts for posts, messages, and transactions
+- Notification center with read/unread and filters
+
+---
+
+## 🧰 Tech Stack
 
 ### Frontend
-- React Native
-- Expo
-- React Navigation
-- React Native Reanimated
-- React Native Gesture Handler
+- React Native, Expo
+- React Navigation, Gesture Handler
 
-### Web3 Integration
-- ethers.js
-- WalletConnect
-- Web3Modal
+### Web3
+- ethers.js, WalletConnect, Web3Modal
 
-### Additional Libraries
-- Axios for API calls
-- date-fns for date manipulation
-- AsyncStorage for local storage
+### Other Libraries
+- Axios, date-fns, AsyncStorage
+- Expo Image & Document Picker
 - React Native Vector Icons
-- Expo Image Picker
-- Expo Document Picker
 
-## Getting Started
+---
+
+## ⚙️ Getting Started
 
 ### Prerequisites
-- Node.js (v14 or higher)
+- Node.js (v14+)
 - npm or yarn
 - Expo CLI
-- MetaMask or other Web3 wallet
+- MetaMask (or WalletConnect-compatible wallet)
 
 ### Installation
 
-1. Clone the repository:
-   ```bash
-   git clone [repository-url]
-   ```
+```bash
+# Clone repo
+git clone https://github.com/ujjawal-mukherjee/CSIweek2.git
+cd CSIweek2
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+# Install dependencies
+npm install
 
-    Start the development server:
-   ```bash
-   npm start
-   ```
+# Start development
+npm start
 
-4. Run on your preferred platform:
-   ```bash
-   # For iOS
-   npm run ios
-   
-   # For Android
-   npm run android
-   
-   # For Web
-   npm run web
 
    ## Project Structure
 
