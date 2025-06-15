@@ -52,7 +52,8 @@ Contract Deployed To sepolia Testnet.
 ### 6. 📝 Create Post
 - Leverage AI-assisted text creation and media uploads  
 - Format posts richly, schedule them, or save drafts  
-<img src="https://github.com/user-attachments/assets/43a1910c-3daa-4e6f-a98a-8e6fcdbf24f9" width="80%" />
+<img src="https://github.com/user-attachments/assets/165b2adc-bd11-4956-8d4e-2f2853947753" width="80%" />
+
 <img src="https://github.com/user-attachments/assets/5d86708c-ae3d-4f66-baf9-0518f40a96e2" width="80%" />
 
 ---
